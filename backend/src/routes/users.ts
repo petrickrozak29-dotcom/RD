@@ -1,36 +1,26 @@
 import { Router } from 'express';
-import { usersData } from '../services/mockData';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
-router.get('/', (_req, res) => {
-  res.json(usersData);
-});
-
-router.post('/', (req, res) => {
-  const { name, email, latitude, longitude } = req.body;
-
-  if (!name || !email) {
-    return res.status(400).json({ error: 'Nama dan email harus diisi.' });
+router.get('/', async (_req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        lastLogin: true
+      }
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
-
-  const existingUserIndex = usersData.findIndex((user) => user.email === email);
-  const userRecord = {
-    id: existingUserIndex >= 0 ? usersData[existingUserIndex].id : usersData.length + 1,
-    name,
-    email,
-    latitude: typeof latitude === 'number' ? latitude : 0,
-    longitude: typeof longitude === 'number' ? longitude : 0,
-    savedAt: new Date().toISOString()
-  };
-
-  if (existingUserIndex >= 0) {
-    usersData[existingUserIndex] = { ...usersData[existingUserIndex], ...userRecord };
-    return res.status(200).json(usersData[existingUserIndex]);
-  }
-
-  usersData.push(userRecord);
-  res.status(201).json(userRecord);
 });
 
 export default router;

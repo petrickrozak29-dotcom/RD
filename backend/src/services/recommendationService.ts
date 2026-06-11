@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { getUserLocation, haversineDistance } from './locationService';
 import OpenAI from 'openai';
-import { culinaryData, eventData, tourismData } from './mockData';
+import { submissionService } from './submissionService';
 
 const prisma = new PrismaClient();
 
@@ -125,18 +125,25 @@ async function getRouteCandidates(
   selectedInterests: string[]
 ): Promise<RouteCandidate[]> {
   const dbTourism = await prisma.tourism.findMany().catch(() => []);
-  const tourismRecords = dbTourism.length > 0
+  const tourismRecordsDb = dbTourism.length > 0
     ? dbTourism.map((item) => ({ ...item, kind: 'wisata' }))
-    : tourismData.map((item) => ({ ...item, kind: 'wisata' }));
+    : [];
 
-  const culinaryRecords = culinaryData
-    .filter((item) => Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
-    .map((item) => ({ ...item, kind: 'kuliner' }));
-  const eventRecords = eventData
-    .filter((item) => item.status === 'approved' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
-    .map((item) => ({ ...item, kind: 'event' }));
+  const submissions = await submissionService.getSubmissions({ status: 'APPROVED' });
+  
+  const tourismRecordsSub = submissions
+    .filter((item) => item.featureType === 'WISATA' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
+    .map((item) => ({ ...item, name: item.title, kind: 'wisata' }));
 
-  const allCandidates = [...tourismRecords, ...culinaryRecords, ...eventRecords];
+  const culinaryRecords = submissions
+    .filter((item) => item.featureType === 'KULINER' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
+    .map((item) => ({ ...item, name: item.title, kind: 'kuliner' }));
+    
+  const eventRecords = submissions
+    .filter((item) => item.featureType === 'EVENT' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
+    .map((item) => ({ ...item, name: item.title, kind: 'event' }));
+
+  const allCandidates = [...tourismRecordsDb, ...tourismRecordsSub, ...culinaryRecords, ...eventRecords];
   const matched = allCandidates.filter((item) => matchesInterest(item, selectedInterests));
   const source = matched.length > 0 ? matched : allCandidates;
 
@@ -154,7 +161,7 @@ async function getRouteCandidates(
           ...record,
           id: String(record.id),
           name: record.name || record.title,
-          category: record.kind === 'kuliner' ? 'Kuliner' : record.kind === 'event' ? record.category || 'Event' : record.category,
+          category: record.kind === 'kuliner' ? 'Kuliner' : record.kind === 'event' ? record.category?.name || 'Event' : record.category?.name || 'Wisata',
           mapId,
           detailUrl: `/smart-map?focus=${mapId}`,
           link: record.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(record.name || record.title)}`,

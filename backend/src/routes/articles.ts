@@ -1,10 +1,16 @@
 import { Router } from 'express';
-import { articlesData } from '../services/mockData';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
-router.get('/', (_req, res) => {
-  res.json(articlesData);
+router.get('/', async (_req, res) => {
+  try {
+    const articles = await prisma.article.findMany();
+    res.json(articles);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch articles' });
+  }
 });
 
 export default router;

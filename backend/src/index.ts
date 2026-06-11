@@ -12,6 +12,11 @@ import locationsRouter from './routes/locations';
 import recommendationsRouter from './routes/recommendations';
 import redisClient from './services/redisClient';
 import { initializeOpenAIClient } from './services/openaiClient';
+import categoriesRouter from './routes/categories';
+import uploadsRouter from './routes/uploads';
+import notificationsRouter from './routes/notifications';
+import submissionsRouter from './routes/submissions';
+import path from 'path';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -31,6 +36,13 @@ app.use('/api/auth', authRouter);
 app.use('/api/developer', developerRouter);
 app.use('/api/locations', locationsRouter);
 app.use('/api/recommendations', recommendationsRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/uploads', uploadsRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/submissions', submissionsRouter);
+
+// Serve uploaded files (note: persistent storage required for production)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/api/health', async (_req, res) => {
   const redisStatus = redisClient.getStatus();

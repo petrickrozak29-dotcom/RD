@@ -1,10 +1,42 @@
 import { Router } from 'express';
-import { culinaryData } from '../services/mockData';
+import { submissionService } from '../services/submissionService';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.json(culinaryData);
+router.get('/', async (req, res) => {
+  try {
+    const includePending = req.query.includePending === 'true';
+    const filters: any = { featureType: 'KULINER' };
+    
+    if (!includePending) {
+      filters.status = 'APPROVED';
+    }
+
+    const culinaryList = await submissionService.getSubmissions(filters);
+    
+    const mappedCulinary = culinaryList.map(item => ({
+      id: item.id,
+      title: item.title,
+      name: item.title, // For backwards compatibility
+      description: item.description,
+      location: item.location,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      image: item.image,
+      link: item.link,
+      priceRange: item.priceRange,
+      category: item.category?.name,
+      typeLabel: item.category?.name,
+      status: item.status.toLowerCase(),
+      submittedBy: item.submittedBy?.email || item.submittedById,
+      createdAt: item.createdAt.toISOString()
+    }));
+
+    res.json(mappedCulinary);
+  } catch (error) {
+    console.error('Error fetching culinary data:', error);
+    res.status(500).json({ error: 'Gagal mengambil data kuliner.' });
+  }
 });
 
 export default router;

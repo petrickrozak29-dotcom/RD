@@ -7,15 +7,36 @@ import Footer from '../../components/footer';
 import GradientBg from '../../components/gradient-bg';
 import AnimatedBackground from '../../components/animated-background';
 import { useAuth } from '../../contexts/AuthContext';
-import {
-  getManagedCulinaryItems,
-  getStoredCommunityCulinary,
-  submitCommunityCulinary,
-  type CommunityCulinary,
-  type SmartMapItem
-} from '../../lib/magelang-data';
+import { getApiBaseUrl } from '../../lib/api';
 
-const culinaryCategories = ['UMKM', 'Makanan Khas', 'Oleh-oleh', 'Kopi & Kafe', 'Pusat Kuliner'];
+type CommunityCulinary = {
+  id: string;
+  title: string;
+  location?: string;
+  description?: string;
+  priceRange?: string;
+  image?: string;
+  link?: string;
+  status?: string;
+  submittedBy?: string;
+};
+
+type SmartMapItem = {
+  id: string;
+  title: string;
+  typeLabel?: string;
+  location?: string;
+  description?: string;
+  priceRange?: string;
+  image?: string;
+  link?: string;
+  rating?: number;
+  tags?: string[];
+  status?: string;
+  submittedBy?: string;
+};
+
+const culinaryCategories = ['Makanan Khas', 'Pusat Kuliner', 'UMKM', 'Kopi dan Kafe'];
 
 export default function KulinerPage() {
   const { user, isAuthenticated } = useAuth();
@@ -34,19 +55,26 @@ export default function KulinerPage() {
   });
 
   useEffect(() => {
-    const refresh = () => {
-      setItems(getManagedCulinaryItems());
-      setSubmissions(getStoredCommunityCulinary());
-    };
-    refresh();
-    window.addEventListener('magelangverse-culinary-updated', refresh);
-    window.addEventListener('magelangverse-content-updated', refresh);
-    window.addEventListener('storage', refresh);
+    let mounted = true;
+
+    async function fetchCulinary() {
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/api/culinary?includePending=false`);
+        if (!res.ok) {
+          setItems([]);
+          return;
+        }
+        const data = await res.json();
+        if (mounted) setItems(data as SmartMapItem[]);
+      } catch (err) {
+        if (mounted) setItems([]);
+      }
+    }
+
+    fetchCulinary();
 
     return () => {
-      window.removeEventListener('magelangverse-culinary-updated', refresh);
-      window.removeEventListener('magelangverse-content-updated', refresh);
-      window.removeEventListener('storage', refresh);
+      mounted = false;
     };
   }, []);
 
@@ -63,9 +91,35 @@ export default function KulinerPage() {
   );
 
   const userSubmissions = useMemo(
-    () => submissions.filter((item) => item.submittedBy === user?.email || item.source === 'user'),
-    [submissions, user?.email]
+    () => submissions,
+    [submissions]
   );
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchMySubmissions() {
+      if (!isAuthenticated || !user) {
+        setSubmissions([]);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/api/submissions?submittedById=${user.id}`);
+        if (!res.ok) {
+          setSubmissions([]);
+          return;
+        }
+        const data = await res.json();
+        if (mounted) setSubmissions(data as CommunityCulinary[]);
+      } catch (err) {
+        if (mounted) setSubmissions([]);
+      }
+    }
+
+    fetchMySubmissions();
+
+    return () => { mounted = false; };
+  }, [isAuthenticated, user]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -142,58 +196,17 @@ export default function KulinerPage() {
           <div className="rounded-lg border border-slate-800 bg-slate-900/80 p-6">
             <h2 className="flex items-center gap-2 text-2xl font-semibold">
               <PlusCircle className="h-6 w-6 text-amber-300" />
-              Tambah Kuliner atau UMKM
+              Tambah Kuliner
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              User bisa mengajukan tempat kuliner sesuai kategori. Data masuk review developer dulu, lalu tampil di Kuliner dan Smart Map setelah disetujui.
+              Semua pengajuan kuliner sekarang difokuskan melalui satu fitur "Community Form". Klik tombol untuk mengajukan Kuliner atau UMKM.
             </p>
 
-            {!isAuthenticated ? (
-              <a href="/login" className="mt-5 inline-flex rounded-lg bg-amber-400 px-5 py-3 font-semibold text-slate-950 hover:bg-amber-300">
-                Login untuk Mengajukan
+            <div className="mt-6">
+              <a href="/admin" className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-3 font-semibold text-slate-950 hover:bg-amber-300">
+                Ajukan via Community Form
               </a>
-            ) : (
-              <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
-                <Field label="Nama Usaha/Kuliner" value={formState.title} onChange={(value) => setFormState({ ...formState, title: value })} required />
-                <label className="block text-sm font-semibold text-slate-200">
-                  Kategori
-                  <select
-                    value={formState.typeLabel}
-                    onChange={(event) => setFormState({ ...formState, typeLabel: event.target.value })}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-amber-400"
-                  >
-                    {culinaryCategories.map((item) => (
-                      <option key={item} value={item}>{item}</option>
-                    ))}
-                  </select>
-                </label>
-                <Field label="Lokasi" value={formState.location} onChange={(value) => setFormState({ ...formState, location: value })} required />
-                <Field label="Rentang Harga" value={formState.priceRange} onChange={(value) => setFormState({ ...formState, priceRange: value })} placeholder="Contoh: Rp 10.000 - Rp 30.000" />
-                <label className="block text-sm font-semibold text-slate-200 md:col-span-2">
-                  Deskripsi
-                  <textarea
-                    value={formState.description}
-                    onChange={(event) => setFormState({ ...formState, description: event.target.value })}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-amber-400"
-                    rows={4}
-                    required
-                  />
-                </label>
-                <Field label="URL Gambar atau Pamflet" value={formState.image} onChange={(value) => setFormState({ ...formState, image: value })} placeholder="https://..." />
-                <label className="block text-sm font-semibold text-slate-200">
-                  Upload Gambar
-                  <span className="mt-2 flex items-center gap-3 rounded-lg border border-dashed border-slate-700 bg-slate-950 px-4 py-3 text-slate-400">
-                    <ImagePlus className="h-5 w-5 text-amber-300" />
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm" />
-                  </span>
-                </label>
-                <Field label="Link Google Maps / Sosial Media" value={formState.link} onChange={(value) => setFormState({ ...formState, link: value })} placeholder="https://..." />
-                <button type="submit" className="rounded-lg bg-amber-400 px-5 py-3 font-semibold text-slate-950 hover:bg-amber-300 md:self-end">
-                  Kirim untuk Review
-                </button>
-              </form>
-            )}
-            {status && <p className="mt-4 text-sm text-amber-200">{status}</p>}
+            </div>
           </div>
 
           <aside className="rounded-lg border border-slate-800 bg-slate-900/80 p-6">

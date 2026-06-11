@@ -814,6 +814,8 @@ export function normalizeApiEvents(records: any[]): CommunityEvent[] {
     });
 }
 
+import { getApiBaseUrl } from './api';
+
 export function submitCommunityEvent(input: CommunityEventInput) {
   const resolved = resolveLocation(input.location);
   const cleanTitle = input.title.trim();
@@ -842,6 +844,32 @@ export function submitCommunityEvent(input: CommunityEventInput) {
   };
 
   writeStoredEvents([newEvent, ...readStoredEvents()]);
+  // Fire-and-forget: send to backend if available
+  (async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      await fetch(`${getApiBaseUrl()}/api/submissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          title: newEvent.title,
+          date: newEvent.date,
+          location: newEvent.location,
+          description: newEvent.description,
+          image: newEvent.image,
+          link: newEvent.link,
+          featureType: 'EVENT',
+          categoryName: newEvent.typeLabel
+        })
+      });
+    } catch (err) {
+      // ignore network errors; local fallback persists
+    }
+  })();
+
   return newEvent;
 }
 
@@ -872,6 +900,28 @@ export function submitCommunityTourism(input: CommunityTourismInput) {
   };
 
   writeStoredTourism([newItem, ...readStoredTourism()]);
+  (async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      await fetch(`${getApiBaseUrl()}/api/submissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          title: newItem.title,
+          location: newItem.location,
+          description: newItem.description,
+          image: newItem.image,
+          link: newItem.link,
+          featureType: 'WISATA',
+          categoryName: newItem.typeLabel
+        })
+      });
+    } catch {}
+  })();
+
   return newItem;
 }
 
@@ -904,6 +954,29 @@ export function submitCommunityCulinary(input: CommunityCulinaryInput) {
   };
 
   writeStoredCulinary([newItem, ...readStoredCulinary()]);
+  (async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      await fetch(`${getApiBaseUrl()}/api/submissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          title: newItem.title,
+          location: newItem.location,
+          description: newItem.description,
+          image: newItem.image,
+          link: newItem.link,
+          priceRange: newItem.priceRange,
+          featureType: 'KULINER',
+          categoryName: newItem.typeLabel
+        })
+      });
+    } catch {}
+  })();
+
   return newItem;
 }
 

@@ -1,23 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import * as authService from '../services/authService';
-import { cultureData, culinaryData, eventData, tourismData } from '../services/mockData';
+import { submissionService } from '../services/submissionService';
 
 const router = Router();
 const prisma = new PrismaClient();
 
 type ContentType = 'tourism' | 'culinary' | 'culture' | 'history';
-
-const contentMap: Record<ContentType, any[]> = {
-  tourism: tourismData as any[],
-  culinary: culinaryData as any[],
-  culture: cultureData as any[],
-  history: cultureData as any[]
-};
-
-function nextNumericId(records: any[]) {
-  return Math.max(0, ...records.map((item) => Number(item.id) || 0)) + 1;
-}
 
 async function authenticateDeveloper(req: Request, res: Response, next: NextFunction) {
   try {
@@ -48,7 +37,7 @@ async function authenticateDeveloper(req: Request, res: Response, next: NextFunc
 router.use(authenticateDeveloper);
 
 router.get('/overview', async (_req, res) => {
-  const [totalUser, users] = await Promise.all([
+  const [totalUser, users, events] = await Promise.all([
     prisma.user.count(),
     prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
@@ -61,17 +50,16 @@ router.get('/overview', async (_req, res) => {
         createdAt: true,
         lastLogin: true
       }
-    })
+    }),
+    submissionService.getSubmissions({ featureType: 'EVENT' })
   ]);
-
-  const events = eventData as any[];
 
   res.json({
     stats: {
       totalUser,
       totalEvent: events.length,
-      eventPending: events.filter((event) => event.status === 'pending').length,
-      eventPublished: events.filter((event) => event.status === 'approved').length
+      eventPending: events.filter((event) => event.status === 'PENDING').length,
+      eventPublished: events.filter((event) => event.status === 'APPROVED').length
     },
     users
   });
@@ -127,126 +115,153 @@ router.patch('/users/:id/toggle-active', async (req, res) => {
   res.json(updated);
 });
 
-router.get('/content/:type', (req, res) => {
-  const type = req.params.type as ContentType;
-
-  if (!contentMap[type]) {
-    return res.status(400).json({ error: 'Tipe konten tidak valid.' });
+function getFeatureType(type: ContentType) {
+  switch (type) {
+    case 'tourism': return 'WISATA';
+    case 'culinary': return 'KULINER';
+    case 'culture': return 'CULTURE';
+    case 'history': return 'HISTORY';
+    default: return 'WISATA';
   }
+}
 
-  const records = type === 'history'
-    ? contentMap[type].filter((item) => item.category === 'Sejarah')
-    : type === 'culture'
-      ? contentMap[type].filter((item) => item.category !== 'Sejarah')
-      : contentMap[type];
-
-  res.json(records);
+router.get('/content/:type', async (req, res) => {
+  try {
+    const type = req.params.type as ContentType;
+    const featureType = getFeatureType(type);
+    
+    const records = await submissionService.getSubmissions({ featureType });
+    res.json(records.map(r => ({ ...r, status: r.status.toLowerCase(), typeLabel: r.category?.name })));
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal mengambil konten' });
+  }
 });
 
-router.post('/content/:type', (req, res) => {
-  const type = req.params.type as ContentType;
-  const records = contentMap[type];
+// Consolidated submissions endpoint for developer dashboard (filter, search)
+router.get('/submissions', async (req, res) => {
+  try {
+    const { status, q } = req.query;
+    const where: any = {};
 
-  if (!records) {
-    return res.status(400).json({ error: 'Tipe konten tidak valid.' });
+    if (status) where.status = String(status).toUpperCase();
+
+    if (q) {
+      const qStr = String(q);
+      where.OR = [
+        { title: { contains: qStr } },
+        { description: { contains: qStr } },
+        { category: { name: { contains: qStr } } }
+      ];
+    }
+
+    const submissions = await prisma.submission.findMany({
+      where,
+      include: {
+        category: true,
+        submittedBy: { select: { id: true, name: true, email: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(submissions.map(s => ({ ...s, status: s.status.toLowerCase(), typeLabel: s.category?.name })));
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal mengambil submissions' });
   }
-
-  const payload = req.body || {};
-  const title = payload.title || payload.name;
-
-  if (!title || !payload.description && !payload.content) {
-    return res.status(400).json({ error: 'Nama/judul dan deskripsi/konten harus diisi.' });
-  }
-
-  const item = {
-    id: nextNumericId(records),
-    ...payload,
-    name: payload.name || payload.title,
-    title: payload.title || payload.name,
-    description: payload.description || payload.content,
-    content: payload.content || payload.description,
-    category: type === 'history' ? 'Sejarah' : payload.category || (type === 'culture' ? 'Budaya' : undefined),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  records.push(item);
-  res.status(201).json(item);
 });
 
-router.put('/content/:type/:id', (req, res) => {
-  const type = req.params.type as ContentType;
-  const records = contentMap[type];
+router.post('/content/:type', async (req, res) => {
+  try {
+    const type = req.params.type as ContentType;
+    const featureType = getFeatureType(type);
+    const payload = req.body || {};
+    
+    const title = payload.title || payload.name;
+    if (!title || (!payload.description && !payload.content)) {
+      return res.status(400).json({ error: 'Nama/judul dan deskripsi/konten harus diisi.' });
+    }
 
-  if (!records) {
-    return res.status(400).json({ error: 'Tipe konten tidak valid.' });
+    const item = await submissionService.createSubmission({
+      title,
+      description: payload.description || payload.content,
+      featureType: featureType as any,
+      categoryName: payload.category || payload.typeLabel || 'Lainnya',
+      location: payload.location,
+      latitude: payload.latitude,
+      longitude: payload.longitude,
+      image: payload.image,
+      link: payload.link,
+      priceRange: payload.priceRange,
+      date: payload.date ? new Date(payload.date) : undefined
+    });
+    
+    // Automatically approve developer-created content
+    await submissionService.updateStatus(item.id, 'APPROVED');
+
+    res.status(201).json({ ...item, status: 'approved' });
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal membuat konten' });
   }
-
-  const index = records.findIndex((item) => String(item.id) === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ error: 'Konten tidak ditemukan.' });
-  }
-
-  records[index] = {
-    ...records[index],
-    ...req.body,
-    name: req.body.name || req.body.title || records[index].name,
-    title: req.body.title || req.body.name || records[index].title,
-    description: req.body.description || req.body.content || records[index].description,
-    content: req.body.content || req.body.description || records[index].content,
-    category: type === 'history' ? 'Sejarah' : req.body.category || records[index].category,
-    updatedAt: new Date().toISOString()
-  };
-
-  res.json(records[index]);
 });
 
-router.delete('/content/:type/:id', (req, res) => {
-  const type = req.params.type as ContentType;
-  const records = contentMap[type];
+router.put('/content/:type/:id', async (req, res) => {
+  try {
+    // In a real scenario we'd create an update method in submissionService.
+    // For now we assume we just update it using prisma directly
+    const id = req.params.id;
+    const payload = req.body;
+    
+    const updated = await prisma.submission.update({
+      where: { id },
+      data: {
+        title: payload.title || payload.name,
+        description: payload.description || payload.content,
+        location: payload.location,
+        latitude: payload.latitude,
+        longitude: payload.longitude,
+        image: payload.image,
+        link: payload.link,
+        priceRange: payload.priceRange
+      }
+    });
 
-  if (!records) {
-    return res.status(400).json({ error: 'Tipe konten tidak valid.' });
+    res.json({ ...updated, status: updated.status.toLowerCase() });
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal update konten' });
   }
-
-  const index = records.findIndex((item) => String(item.id) === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ error: 'Konten tidak ditemukan.' });
-  }
-
-  const [deleted] = records.splice(index, 1);
-  res.json(deleted);
 });
 
-router.patch('/events/:id/status', (req, res) => {
-  const { status } = req.body;
-  const allowed = ['approved', 'pending', 'rejected'];
-
-  if (!allowed.includes(status)) {
-    return res.status(400).json({ error: 'Status event tidak valid.' });
+router.delete('/content/:type/:id', async (req, res) => {
+  try {
+    const deleted = await submissionService.deleteSubmission(req.params.id);
+    res.json(deleted);
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal hapus konten' });
   }
-
-  const event = (eventData as any[]).find((item) => String(item.id) === req.params.id);
-
-  if (!event) {
-    return res.status(404).json({ error: 'Event tidak ditemukan.' });
-  }
-
-  event.status = status;
-  event.reviewedAt = new Date().toISOString();
-  res.json(event);
 });
 
-router.delete('/events/:id', (req, res) => {
-  const records = eventData as any[];
-  const index = records.findIndex((item) => String(item.id) === req.params.id);
+router.patch('/events/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const upperStatus = String(status).toUpperCase();
 
-  if (index === -1) {
-    return res.status(404).json({ error: 'Event tidak ditemukan.' });
+    if (!['APPROVED', 'PENDING', 'REJECTED'].includes(upperStatus)) {
+      return res.status(400).json({ error: 'Status event tidak valid.' });
+    }
+
+    const event = await submissionService.updateStatus(req.params.id, upperStatus as any);
+    res.json({ ...event, status: event.status.toLowerCase() });
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal ubah status' });
   }
+});
 
-  const [deleted] = records.splice(index, 1);
-  res.json(deleted);
+router.delete('/events/:id', async (req, res) => {
+  try {
+    const deleted = await submissionService.deleteSubmission(req.params.id);
+    res.json(deleted);
+  } catch (err) {
+    res.status(500).json({ error: 'Gagal hapus event' });
+  }
 });
 
 export default router;

@@ -29,6 +29,8 @@ model User {
   preferences      UserPreferences?
   locations        UserLocation[]
   savedItineraries SavedItinerary[]
+  submissions      Submission[]     @relation("UserSubmissions")
+  notifications    Notification[]
 
   @@index([email])
   @@index([role])
@@ -138,4 +140,92 @@ model Article {
   title    String
   content  String
   category String
+}
+
+// ==================== Dynamic Features Models ====================
+
+model FeatureToggle {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "Event", "Wisata", "Kuliner", "Smart Magelang"
+  isActive    Boolean  @default(true)
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  featureType String // e.g., "EVENT", "WISATA", "KULINER", "SMART_MAGELANG"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  submissions           Submission[]
+  smartMagelangContents SmartMagelangContent[]
+
+  @@unique([name, featureType])
+  @@index([featureType])
+}
+
+model Submission {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  featureType String // "EVENT", "WISATA", "KULINER"
+  status      String @default("PENDING") // "PENDING", "APPROVED", "REJECTED"
+
+  // Relations
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  submittedById String?
+  submittedBy   User?   @relation("UserSubmissions", fields: [submittedById], references: [id], onDelete: SetNull)
+
+  // Location Data
+  location  String?
+  latitude  Float?
+  longitude Float?
+
+  // Additional Data
+  image      String?
+  link       String?
+  priceRange String?
+  date       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([featureType])
+  @@index([status])
+  @@index([categoryId])
+  @@index([submittedById])
+}
+
+model SmartMagelangContent {
+  id          String  @id @default(cuid())
+  title       String
+  description String
+  sourceUrl   String?
+  image       String?
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+// Notifications for user and developer/admin alerts
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  payload   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

@@ -1,48 +1,51 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, ExternalLink, ImagePlus, Link as LinkIcon, MapPin, ShieldCheck, XCircle } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { Camera, CheckCircle2, ExternalLink, ImagePlus, Link as LinkIcon, MapPin, ShieldCheck, XCircle, CalendarDays, Ticket } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
 import GradientBg from '../../components/gradient-bg';
 import { getApiBaseUrl } from '../../lib/api';
-import {
-  eventCategories,
-  formatDate,
-  getCommunityEvents,
-  getStoredCommunityEvents,
-  normalizeApiEvents,
-  submitCommunityEvent,
-  updateCommunityEventStatus,
-  type CommunityEvent,
-  type EventCategory
-} from '../../lib/magelang-data';
 
-export default function AdminPage() {
+type FeatureType = 'EVENT' | 'WISATA' | 'KULINER';
+
+interface Category {
+  id: string;
+  name: string;
+  featureType: string;
+}
+
+const WISATA_CATEGORIES = ['Alam', 'Sejarah', 'Taman Rekreasi', 'Spot Populer'];
+const KULINER_CATEGORIES = ['Makanan Khas', 'Pusat Kuliner', 'UMKM', 'Kopi dan Kafe'];
+const EVENT_CATEGORIES = ['Konser Musik', 'Seni & Budaya', 'Pameran', 'Agenda Lokal'];
+
+export default function CommunityFormPage() {
   const router = useRouter();
   const { user, token, isAuthenticated, loading } = useAuth();
-  const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [apiEvents, setApiEvents] = useState<CommunityEvent[]>([]);
+  
+  const [featureType, setFeatureType] = useState<FeatureType>('EVENT');
   const [status, setStatus] = useState('');
-  const [formState, setFormState] = useState<{
-    title: string;
-    date: string;
-    typeLabel: EventCategory;
-    location: string;
-    description: string;
-    image: string;
-    link: string;
-  }>({
+  const [formState, setFormState] = useState({
     title: '',
-    date: '',
-    typeLabel: 'Agenda Lokal',
-    location: '',
     description: '',
+    categoryName: '',
+    location: '',
     image: '',
-    link: ''
+    link: '',
+    date: '',
+    priceRange: ''
   });
+
+  const [preview, setPreview] = useState(false);
+
+  // Set default category when feature type changes
+  useEffect(() => {
+    if (featureType === 'EVENT') setFormState(s => ({ ...s, categoryName: EVENT_CATEGORIES[0] }));
+    if (featureType === 'WISATA') setFormState(s => ({ ...s, categoryName: WISATA_CATEGORIES[0] }));
+    if (featureType === 'KULINER') setFormState(s => ({ ...s, categoryName: KULINER_CATEGORIES[0] }));
+  }, [featureType]);
 
   const isDeveloper = user?.role === 'ADMIN';
 
@@ -52,129 +55,96 @@ export default function AdminPage() {
     }
   }, [isDeveloper, loading, router]);
 
-  const refreshLocalEvents = () => {
-    setEvents(getCommunityEvents(apiEvents));
-  };
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  useEffect(() => {
-    setEvents(getCommunityEvents(apiEvents));
-  }, [apiEvents]);
-
-  useEffect(() => {
-    const refresh = () => setEvents(getCommunityEvents(apiEvents));
-    window.addEventListener('magelangverse-events-updated', refresh);
-    window.addEventListener('storage', refresh);
-
-    return () => {
-      window.removeEventListener('magelangverse-events-updated', refresh);
-      window.removeEventListener('storage', refresh);
-    };
-  }, [apiEvents]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function fetchEvents() {
-      try {
-        const response = await fetch(`${getApiBaseUrl()}/api/events?includePending=true`);
-        if (!response.ok) return;
-        const payload = await response.json();
-        const records = Array.isArray(payload) ? payload : payload.events;
-        if (mounted) setApiEvents(normalizeApiEvents(records));
-      } catch {
-        if (mounted) setApiEvents([]);
-      }
+    if (file.size > 5 * 1024 * 1024) {
+      setStatus('Gagal: Ukuran gambar maksimal 5 MB.');
+      return;
     }
 
-    fetchEvents();
+    // If authenticated, attempt to upload to backend uploads endpoint
+    (async () => {
+      try {
+        if (token) {
+          const fd = new FormData();
+          fd.append('image', file);
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+          const res = await fetch(`${getApiBaseUrl()}/api/uploads/image`, {
+            method: 'POST',
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {})
+            },
+            body: fd
+          });
 
-  const userSubmissions = useMemo(
-    () => getStoredCommunityEvents().filter((item) => item.submittedBy === user?.email || item.source === 'user'),
-    [events, user?.email]
-  );
+          if (res.ok) {
+            const body = await res.json();
+            setFormState((current) => ({ ...current, image: body.url }));
+            setStatus('');
+            return;
+          }
+        }
 
-  const pendingEvents = useMemo(
-    () => events.filter((item) => item.status === 'pending'),
-    [events]
-  );
+        // Fallback to base64 when not authenticated or upload failed
+        const reader = new FileReader();
+        reader.onload = () => {
+          setFormState((current) => ({ ...current, image: String(reader.result || '') }));
+          setStatus('');
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setFormState((current) => ({ ...current, image: String(reader.result || '') }));
+          setStatus('');
+        };
+        reader.readAsDataURL(file);
+      }
+    })();
+  };
 
-  const approvedEvents = useMemo(
-    () => events.filter((item) => item.status === 'approved'),
-    [events]
-  );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!preview) {
+      setPreview(true);
+      return;
+    }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setStatus('Menyimpan event komunitas...');
-
-    const saved = submitCommunityEvent({
-      ...formState,
-      submittedBy: user?.email
-    });
-
-    setFormState({
-      title: '',
-      date: '',
-      typeLabel: 'Agenda Lokal',
-      location: '',
-      description: '',
-      image: '',
-      link: ''
-    });
-    refreshLocalEvents();
+    setStatus('Mengirim submission...');
 
     try {
-      await fetch(`${getApiBaseUrl()}/api/events`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/submissions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
-          title: saved.title,
-          date: saved.date,
-          location: saved.location,
-          description: saved.description,
-          image: saved.image,
-          link: saved.link,
-          latitude: saved.latitude,
-          longitude: saved.longitude,
-          typeLabel: saved.typeLabel,
-          category: saved.typeLabel,
-          status: 'pending',
-          submittedBy: user?.email
+          ...formState,
+          featureType,
+          submittedById: user?.id
         })
       });
 
-      setStatus('Event tersimpan dan masuk antrean persetujuan developer.');
+      if (!response.ok) throw new Error('Gagal menyimpan');
+      
+      setStatus('Berhasil! Submission masuk antrean review developer.');
+      setFormState({
+        title: '',
+        description: '',
+        categoryName: formState.categoryName,
+        location: '',
+        image: '',
+        link: '',
+        date: '',
+        priceRange: ''
+      });
+      setPreview(false);
     } catch {
-      setStatus('Event tersimpan lokal dan menunggu persetujuan developer. Backend belum tersambung.');
+      setStatus('Gagal menyimpan submission. Silakan coba lagi.');
     }
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormState((current) => ({ ...current, image: String(reader.result || '') }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleModeration = (id: string, nextStatus: 'approved' | 'rejected') => {
-    updateCommunityEventStatus(id, nextStatus);
-    refreshLocalEvents();
-    setStatus(nextStatus === 'approved'
-      ? 'Event disetujui dan akan tampil di Smart Map.'
-      : 'Event ditolak dari daftar publik.'
-    );
   };
 
   if (loading) {
@@ -191,8 +161,8 @@ export default function AdminPage() {
         <Navbar />
         <main className="mx-auto flex min-h-[70vh] max-w-4xl items-center justify-center px-6 py-16 text-center text-white">
           <section className="rounded-lg border border-slate-800 bg-slate-900/80 p-8">
-            <h1 className="text-3xl font-bold text-cyan-300">Community Event</h1>
-            <p className="mt-3 text-slate-300">Login diperlukan untuk mengirim event komunitas agar pengirimnya bisa dilacak saat proses approval.</p>
+            <h1 className="text-3xl font-bold text-cyan-300">Community Form</h1>
+            <p className="mt-3 text-slate-300">Login diperlukan untuk mengirim rekomendasi event, wisata, atau kuliner.</p>
             <a href="/login" className="mt-6 inline-block rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 hover:bg-cyan-300">
               Login
             </a>
@@ -203,229 +173,158 @@ export default function AdminPage() {
     );
   }
 
+  const categoryOptions = featureType === 'EVENT' ? EVENT_CATEGORIES :
+                          featureType === 'WISATA' ? WISATA_CATEGORIES :
+                          KULINER_CATEGORIES;
+
   return (
     <GradientBg>
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-12 text-white sm:px-6 lg:py-16">
-        <section className="mb-8">
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-cyan-300">
+      <main className="mx-auto max-w-4xl px-4 py-12 text-white sm:px-6 lg:py-16">
+        <section className="mb-8 text-center">
+          <p className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-cyan-300">
             <ShieldCheck className="h-4 w-4" />
-            Community Event
+            Community Form
           </p>
-          <h1 className="mt-3 text-4xl font-bold sm:text-5xl">Ajukan event warga Magelang</h1>
-          <p className="mt-4 max-w-3xl text-slate-300">
-            Isi judul, tanggal, lokasi, deskripsi, dan link Instagram, Google Maps, atau WhatsApp. Event masuk antrean review dulu, lalu tampil otomatis di Smart Map dan list event setelah disetujui developer.
+          <h1 className="mt-3 text-4xl font-bold sm:text-5xl">Ajukan Konten ke Smart Map</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-slate-300">
+            Pilih jenis konten, isi detailnya, lalu preview. Konten akan tampil publik setelah disetujui.
           </p>
         </section>
 
-        <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-lg border border-slate-800 bg-slate-900/80 p-6">
-            <h2 className="text-2xl font-semibold text-white">Form Event</h2>
-            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-              <label className="block text-sm font-semibold text-slate-200">
-                Judul
-                <input
-                  type="text"
-                  value={formState.title}
-                  onChange={(event) => setFormState({ ...formState, title: event.target.value })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                  placeholder="Contoh: Pasar Seni Magelang"
-                  required
-                />
-              </label>
+        <section className="rounded-lg border border-slate-800 bg-slate-900/80 p-6 md:p-8">
+          {!preview ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-3">
+                <button type="button" onClick={() => setFeatureType('EVENT')} className={`rounded-lg border p-4 text-center transition ${featureType === 'EVENT' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}>
+                  <h3 className="font-bold text-white">Event</h3>
+                </button>
+                <button type="button" onClick={() => setFeatureType('WISATA')} className={`rounded-lg border p-4 text-center transition ${featureType === 'WISATA' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}>
+                  <h3 className="font-bold text-white">Wisata</h3>
+                </button>
+                <button type="button" onClick={() => setFeatureType('KULINER')} className={`rounded-lg border p-4 text-center transition ${featureType === 'KULINER' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}>
+                  <h3 className="font-bold text-white">Kuliner</h3>
+                </button>
+              </div>
 
-              <label className="block text-sm font-semibold text-slate-200">
-                Tanggal
-                <input
-                  type="date"
-                  value={formState.date}
-                  onChange={(event) => setFormState({ ...formState, date: event.target.value })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                  required
-                />
-              </label>
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field label={`Nama ${featureType}`} value={formState.title} onChange={(v) => setFormState({ ...formState, title: v })} required />
+                
+                <label className="block text-sm font-semibold text-slate-200">
+                  Kategori
+                  <select
+                    value={formState.categoryName}
+                    onChange={(e) => setFormState({ ...formState, categoryName: e.target.value })}
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+                  >
+                    {categoryOptions.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                  </select>
+                </label>
 
-              <label className="block text-sm font-semibold text-slate-200">
-                Kategori Event
-                <select
-                  value={formState.typeLabel}
-                  onChange={(event) => setFormState({ ...formState, typeLabel: event.target.value as EventCategory })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                >
-                  {eventCategories.map((item) => (
-                    <option key={item} value={item}>{item}</option>
-                  ))}
-                </select>
-              </label>
+                <Field label="Lokasi" value={formState.location} onChange={(v) => setFormState({ ...formState, location: v })} required />
+                
+                {featureType === 'EVENT' && (
+                  <Field label="Tanggal Event" type="date" value={formState.date} onChange={(v) => setFormState({ ...formState, date: v })} required />
+                )}
+                
+                {featureType === 'KULINER' && (
+                  <Field label="Rentang Harga" placeholder="Contoh: Rp 15.000 - Rp 50.000" value={formState.priceRange} onChange={(v) => setFormState({ ...formState, priceRange: v })} required />
+                )}
 
-              <label className="block text-sm font-semibold text-slate-200">
-                Lokasi
-                <input
-                  type="text"
-                  value={formState.location}
-                  onChange={(event) => setFormState({ ...formState, location: event.target.value })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                  placeholder="Contoh: Alun-alun Magelang"
-                  required
-                />
-              </label>
+                <label className="block text-sm font-semibold text-slate-200 md:col-span-2">
+                  Deskripsi
+                  <textarea
+                    value={formState.description}
+                    onChange={(e) => setFormState({ ...formState, description: e.target.value })}
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+                    rows={4}
+                    required
+                  />
+                </label>
 
-              <label className="block text-sm font-semibold text-slate-200">
-                Deskripsi
-                <textarea
-                  value={formState.description}
-                  onChange={(event) => setFormState({ ...formState, description: event.target.value })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                  rows={5}
-                  placeholder="Ceritakan agenda, penyelenggara, dan info penting event."
-                  required
-                />
-              </label>
+                <label className="block text-sm font-semibold text-slate-200">
+                  Upload Gambar (Max 5MB)
+                  <span className="mt-2 flex items-center gap-3 rounded-lg border border-dashed border-slate-700 bg-slate-950 px-4 py-3 text-slate-400">
+                    <ImagePlus className="h-5 w-5 text-cyan-300" />
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm" />
+                  </span>
+                </label>
+                
+                <Field label="Link Terkait (Google Maps / IG / Web)" value={formState.link} onChange={(v) => setFormState({ ...formState, link: v })} placeholder="https://..." />
+              </div>
 
-              <label className="block text-sm font-semibold text-slate-200">
-                URL Gambar / Pamflet Event
-                <input
-                  type="url"
-                  value={formState.image}
-                  onChange={(event) => setFormState({ ...formState, image: event.target.value })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                  placeholder="https://..."
-                />
-              </label>
-
-              <label className="block text-sm font-semibold text-slate-200">
-                Upload Gambar / Pamflet
-                <span className="mt-2 flex items-center gap-3 rounded-lg border border-dashed border-slate-700 bg-slate-950 px-4 py-3 text-slate-400">
-                  <ImagePlus className="h-5 w-5 text-cyan-300" />
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm" />
-                </span>
-              </label>
-
-              <label className="block text-sm font-semibold text-slate-200">
-                Link Instagram / Google Maps / WhatsApp
-                <input
-                  type="url"
-                  value={formState.link}
-                  onChange={(event) => setFormState({ ...formState, link: event.target.value })}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-                  placeholder="https://..."
-                />
-              </label>
-
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300"
-              >
-                Kirim untuk Review
+              <button type="submit" className="w-full rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300">
+                Lanjutkan ke Preview
               </button>
             </form>
-            {status && <p className="mt-4 text-sm text-cyan-200">{status}</p>}
-          </div>
-
-          <div className="space-y-6">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/80 p-6">
-              <h2 className="text-2xl font-semibold text-white">Submission Saya</h2>
-              <div className="mt-5 space-y-4">
-                {userSubmissions.map((item) => (
-                  <EventCard key={item.id} item={item} />
-                ))}
-                {userSubmissions.length === 0 && (
-                  <p className="text-sm text-slate-400">Belum ada event yang dikirim dari perangkat ini.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-800 bg-slate-900/80 p-6">
-              <h2 className="text-2xl font-semibold text-white">Event Publik</h2>
-              <p className="mt-2 text-sm text-slate-400">{approvedEvents.length} event sudah tampil di Smart Map.</p>
-              <div className="mt-5 space-y-4">
-                {approvedEvents.slice(0, 4).map((item) => (
-                  <EventCard key={item.id} item={item} compact />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {isDeveloper && (
-          <section className="mt-8 rounded-lg border border-cyan-400/30 bg-slate-900/80 p-6">
-            <h2 className="text-2xl font-semibold text-cyan-200">Developer Approval</h2>
-            <p className="mt-2 text-sm text-slate-400">Event pending dari user disetujui dulu sebelum masuk map publik.</p>
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {pendingEvents.map((item) => (
-                <article key={item.id} className="rounded-lg border border-slate-800 bg-slate-950/80 p-5">
-                  <EventCard item={item} compact />
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleModeration(item.id, 'approved')}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      Setujui
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleModeration(item.id, 'rejected')}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300"
-                    >
-                      <XCircle className="h-4 w-4" />
-                      Tolak
-                    </button>
+          ) : (
+            <div className="space-y-6">
+              <h2 className="text-xl font-bold border-b border-slate-700 pb-2">Preview Submission</h2>
+              
+              <article className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
+                {formState.image && <img src={formState.image} alt="Preview" className="h-48 w-full object-cover" />}
+                <div className="p-5">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200">
+                      {formState.categoryName} ({featureType})
+                    </span>
                   </div>
-                </article>
-              ))}
-              {pendingEvents.length === 0 && (
-                <p className="text-sm text-slate-400">Tidak ada event pending.</p>
-              )}
+                  <h3 className="text-2xl font-bold text-white">{formState.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{formState.description}</p>
+                  
+                  <div className="mt-4 space-y-2 text-sm text-slate-400">
+                    <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-cyan-300" /> {formState.location}</p>
+                    {featureType === 'EVENT' && <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-amber-300" /> {formState.date}</p>}
+                    {featureType === 'KULINER' && <p className="flex items-center gap-2"><Ticket className="h-4 w-4 text-emerald-300" /> {formState.priceRange}</p>}
+                  </div>
+                </div>
+              </article>
+
+              <div className="flex gap-4">
+                <button type="button" onClick={() => setPreview(false)} className="w-full rounded-lg border border-slate-600 bg-slate-800 px-6 py-3 font-semibold text-white transition hover:bg-slate-700">
+                  Edit Kembali
+                </button>
+                <button type="button" onClick={handleSubmit} className="w-full rounded-lg bg-emerald-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-300">
+                  Submit Sekarang
+                </button>
+              </div>
             </div>
-          </section>
-        )}
+          )}
+
+          {status && <p className={`mt-5 rounded-lg p-4 text-center font-semibold ${status.includes('Gagal') ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}`}>{status}</p>}
+        </section>
       </main>
       <Footer />
     </GradientBg>
   );
 }
 
-function EventCard({ item, compact = false }: { item: CommunityEvent; compact?: boolean }) {
-  const statusClass = item.status === 'approved'
-    ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
-    : item.status === 'pending'
-      ? 'border-amber-400/40 bg-amber-500/10 text-amber-200'
-      : 'border-rose-400/40 bg-rose-500/10 text-rose-200';
-
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  type = 'text'
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
+}) {
   return (
-    <article className={compact ? '' : 'rounded-lg border border-slate-800 bg-slate-950/80 p-4'}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold text-white">{item.title}</h3>
-          <p className="mt-1 flex items-center gap-2 text-sm text-slate-400">
-            <CalendarDays className="h-4 w-4" />
-            {formatDate(item.date)}
-          </p>
-        </div>
-        <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}>
-          {item.status}
-        </span>
-      </div>
-      <p className="mt-3 flex gap-2 text-sm text-slate-400">
-        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-        <span>{item.location}</span>
-      </p>
-      {!compact && <p className="mt-3 text-sm leading-6 text-slate-300">{item.description}</p>}
-      <div className="mt-4 flex flex-wrap gap-3">
-        <a href={`/smart-map?focus=${item.id}`} className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-          <MapPin className="h-4 w-4" />
-          Lihat Detail
-        </a>
-        {item.link && (
-          <a href={item.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-            <LinkIcon className="h-4 w-4" />
-            Open Link
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        )}
-      </div>
-    </article>
+    <label className="block text-sm font-semibold text-slate-200">
+      {label}
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        required={required}
+        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+      />
+    </label>
   );
 }

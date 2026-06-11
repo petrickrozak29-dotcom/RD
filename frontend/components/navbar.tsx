@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { LogOut, UserCircle } from 'lucide-react';
+import { LogOut, UserCircle, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Navbar() {
@@ -29,7 +29,12 @@ export default function Navbar() {
             </>
           )}
           {isAuthenticated && !isDeveloper && (
-            <Link href="/admin">Community Event</Link>
+            <>
+              <Link href="/admin">Community Form</Link>
+              <Link href="/notifications" className="ml-2 inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-slate-200 hover:bg-slate-800">
+                <Bell className="h-4 w-4" />
+              </Link>
+            </>
           )}
           {!loading && (
             isAuthenticated ? (

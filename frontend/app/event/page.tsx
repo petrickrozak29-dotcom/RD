@@ -10,8 +10,6 @@ import { getApiBaseUrl } from '../../lib/api';
 import {
   formatDate,
   eventCategories,
-  getActiveCommunityEvents,
-  normalizeApiEvents,
   type CommunityEvent,
   type EventCategory
 } from '../../lib/magelang-data';
@@ -46,7 +44,7 @@ export default function EventPage() {
         if (!response.ok) return;
         const payload = await response.json();
         const records = Array.isArray(payload) ? payload : payload.events;
-        if (mounted) setApiEvents(normalizeApiEvents(records));
+        if (mounted) setApiEvents(records as CommunityEvent[]);
       } catch {
         if (mounted) setApiEvents([]);
       }
@@ -60,8 +58,8 @@ export default function EventPage() {
   }, [dataVersion]);
 
   const events = useMemo(() => {
-    const approved = getActiveCommunityEvents(apiEvents).filter((item) => item.status === 'approved');
-    return activeFilter === 'semua' ? approved : approved.filter((item) => item.typeLabel === activeFilter);
+    const approved = apiEvents.filter((item) => item.status === 'approved' && new Date(item.date).getTime() >= Date.now() - 86400000);
+    return activeFilter === 'semua' ? approved : approved.filter((item) => item.typeLabel === activeFilter || item.category === activeFilter);
   }, [apiEvents, activeFilter, dataVersion]);
 
   return (
@@ -83,7 +81,7 @@ export default function EventPage() {
               </p>
             </div>
             <a
-              href="/admin"
+              href="/community-form"
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-400 px-5 py-3 font-semibold text-slate-950 transition hover:bg-rose-300"
             >
               <PlusCircle className="h-5 w-5" />
