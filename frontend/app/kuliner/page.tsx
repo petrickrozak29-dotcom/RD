@@ -79,10 +79,10 @@ export default function KulinerPage() {
     };
   }, []);
 
-  const filters = useMemo(
-    () => ['Semua', ...Array.from(new Set(items.map((item) => item.typeLabel)))],
-    [items]
-  );
+  const filters = useMemo(() => {
+    const types = items.map((item) => item.typeLabel ?? 'Lainnya');
+    return ['Semua', ...Array.from(new Set(types))];
+  }, [items]);
 
   const filtered = useMemo(
     () => selectedFilter === 'Semua'
