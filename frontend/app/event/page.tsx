@@ -58,7 +58,12 @@ export default function EventPage() {
   }, [dataVersion]);
 
   const events = useMemo(() => {
-    const approved = apiEvents.filter((item) => item.status === 'approved' && new Date(item.date).getTime() >= Date.now() - 86400000);
+    const approved = apiEvents.filter((item) => {
+      if (item.status !== 'approved') return false;
+      if (!item.date) return false;
+      return new Date(item.date).getTime() >= Date.now() - 86400000;
+    });
+
     return activeFilter === 'semua' ? approved : approved.filter((item) => item.typeLabel === activeFilter || item.category === activeFilter);
   }, [apiEvents, activeFilter, dataVersion]);
 
