@@ -11,10 +11,11 @@ import { getApiBaseUrl } from '../../lib/api';
 import {
   formatDate,
   getCommunityEvents,
-  getStoredCommunityCulinary,
   fetchEvents,
+  fetchUserSubmissions,
   type CommunityCulinary,
   type CommunityEvent,
+  type CommunityTourism,
   type EventStatus
 } from '../../lib/magelang-data';
 
@@ -27,6 +28,7 @@ export default function ProfilePage() {
   const [savingPassword, setSavingPassword] = useState(false);
   const [apiEvents, setApiEvents] = useState<CommunityEvent[]>([]);
   const [culinarySubmissions, setCulinarySubmissions] = useState<CommunityCulinary[]>([]);
+  const [tourismSubmissions, setTourismSubmissions] = useState<CommunityTourism[]>([]);
   const [eventFilter, setEventFilter] = useState<EventStatus>('pending');
   const [culinaryFilter, setCulinaryFilter] = useState<EventStatus>('pending');
   const [dataVersion, setDataVersion] = useState(0);
@@ -71,8 +73,37 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    setCulinarySubmissions(getStoredCommunityCulinary());
-  }, [dataVersion]);
+    let mounted = true;
+
+    async function loadUserSubmissions() {
+      if (!user) {
+        if (mounted) setCulinarySubmissions([]);
+        return;
+      }
+
+      try {
+        // Prefer API helper which supports backend as source-of-truth
+        const data = await fetchUserSubmissions(user.id);
+        if (!mounted) return;
+        const culinaries = Array.isArray(data)
+          ? data.filter((s: any) => String(s.featureType).toUpperCase() === 'KULINER')
+          : [];
+
+        const tourism = Array.isArray(data)
+          ? data.filter((s: any) => String(s.featureType).toUpperCase() === 'WISATA')
+          : [];
+
+        setCulinarySubmissions(culinaries as CommunityCulinary[]);
+        setTourismSubmissions(tourism as CommunityTourism[]);
+      } catch (err) {
+        if (mounted) setCulinarySubmissions([]);
+      }
+    }
+
+    loadUserSubmissions();
+
+    return () => { mounted = false; };
+  }, [dataVersion, user]);
 
   useEffect(() => {
     let mounted = true;
@@ -134,11 +165,6 @@ export default function ProfilePage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Enforce client-side size limit for avatar (3 MB)
-    if (file.size > 3 * 1024 * 1024) {
-      setProfileStatus('Gagal: Ukuran foto profil maksimal 3 MB.');
-      return;
-    }
 
     // If authenticated, try uploading to backend uploads endpoint
     (async () => {

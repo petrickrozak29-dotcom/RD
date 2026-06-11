@@ -62,13 +62,14 @@ export default function KulinerPage() {
     let timer: any;
     async function fetchCulinary(q?: string) {
       try {
-        const params = new URLSearchParams();
-        params.set('includePending', 'false');
-        if (q) params.set('q', q);
-        const res = await fetch(`${getApiBaseUrl()}/api/culinary?${params.toString()}`);
-        if (!res.ok) return setItems([]);
-        const data = await res.json();
-        setItems(data as SmartMapItem[]);
+        const items = await fetchCulinaryItems( /* includePending= */ false);
+        if (!mounted) return;
+        if (q) {
+          const lower = q.toLowerCase();
+          setItems(items.filter(i => (i.title || '').toLowerCase().includes(lower) || (i.typeLabel || '').toLowerCase().includes(lower)));
+        } else {
+          setItems(items as SmartMapItem[]);
+        }
       } catch (err) {
         setItems([]);
       }
@@ -80,11 +81,7 @@ export default function KulinerPage() {
       mounted = false;
       clearTimeout(timer);
     };
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  }, [search]);
 
   const filters = useMemo(() => {
     const types = items.map((item) => item.typeLabel ?? 'Lainnya');
@@ -133,11 +130,7 @@ export default function KulinerPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Enforce client-side size limit for submission images (5 MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setStatus('Gagal: Ukuran gambar maksimal 5 MB.');
-      return;
-    }
+    
 
     const reader = new FileReader();
     reader.onload = () => {

@@ -74,10 +74,7 @@ export default function CommunityFormPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setStatus('Gagal: Ukuran gambar maksimal 5 MB.');
-      return;
-    }
+    
 
     // If authenticated, attempt to upload to backend uploads endpoint
     (async () => {
@@ -263,7 +260,7 @@ export default function CommunityFormPage() {
                 </label>
 
                 <label className="block text-sm font-semibold text-slate-200">
-                  Upload Gambar (Max 5MB)
+                  Upload Gambar
                   <span className="mt-2 flex items-center gap-3 rounded-lg border border-dashed border-slate-700 bg-slate-950 px-4 py-3 text-slate-400">
                     <ImagePlus className="h-5 w-5 text-cyan-300" />
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm" />

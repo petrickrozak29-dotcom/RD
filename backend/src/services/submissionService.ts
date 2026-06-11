@@ -30,7 +30,6 @@ export const submissionService = {
         data: { name: categoryName, featureType }
       });
     }
-
     const newSubmission = await prisma.submission.create({
       data: {
         ...rest,

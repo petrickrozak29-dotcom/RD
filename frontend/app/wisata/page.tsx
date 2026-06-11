@@ -32,22 +32,21 @@ export default function WisataPage() {
     let timer: any;
     async function fetchTourism(q?: string) {
       try {
-        const params = new URLSearchParams();
-        params.set('includePending', 'false');
-        if (q) params.set('q', q);
-
-        const response = await fetch(`${getApiBaseUrl()}/api/tourism?${params.toString()}`);
-        if (!response.ok) return;
-        const data = await response.json();
-
-        const formatted = data.map((item: any) => ({
+        const items = await (await import('../../lib/magelang-data')).fetchTourismItems(false);
+        if (!mounted) return;
+        const formatted = items.map((item: any) => ({
           ...item,
           rating: item.rating || 4.5,
           openingHours: item.openingHours || '08:00 - 17:00',
           tags: item.tags || [item.typeLabel]
         }));
 
-        if (mounted) setItems(formatted);
+        if (q) {
+          const lower = q.toLowerCase();
+          setItems(formatted.filter((i: any) => (i.title || '').toLowerCase().includes(lower) || (i.typeLabel || '').toLowerCase().includes(lower)));
+        } else {
+          setItems(formatted);
+        }
       } catch (error) {
         console.error('Failed to fetch tourism data:', error);
       }
@@ -59,11 +58,7 @@ export default function WisataPage() {
       mounted = false;
       clearTimeout(timer);
     };
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  }, [search]);
 
   const categories = useMemo(
     () => ['Semua', ...Array.from(new Set(items.map((item) => item.typeLabel).filter(Boolean)))],

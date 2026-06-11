@@ -748,12 +748,7 @@ function ContentManager({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Enforce client-side size limit for submission images (5 MB)
-    if (file.size > 5 * 1024 * 1024) {
-      if (setStatus) setStatus('Gagal: Ukuran gambar maksimal 5 MB.');
-      else alert('Gagal: Ukuran gambar maksimal 5 MB.');
-      return;
-    }
+    
 
     const reader = new FileReader();
     reader.onload = () => {

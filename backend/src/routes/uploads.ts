@@ -22,14 +22,13 @@ function imageFileFilter(_req: Request, file: Express.Multer.File, cb: multer.Fi
   cb(null, true);
 }
 
-const avatarUpload = multer({ storage, limits: { fileSize: 3 * 1024 * 1024 }, fileFilter: imageFileFilter });
-const imageUpload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: imageFileFilter });
+const avatarUpload = multer({ storage, fileFilter: imageFileFilter });
+const imageUpload = multer({ storage, fileFilter: imageFileFilter });
 
 router.post('/avatar', (req: Request, res: Response) => {
   avatarUpload.single('avatar')(req as any, res as any, (err: any) => {
     if (err) {
-      if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: 'Avatar file too large (max 3 MB)' });
-      return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message || 'Upload failed' });
     }
 
     const file = (req as any).file;
@@ -42,8 +41,7 @@ router.post('/avatar', (req: Request, res: Response) => {
 router.post('/image', (req: Request, res: Response) => {
   imageUpload.single('image')(req as any, res as any, (err: any) => {
     if (err) {
-      if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: 'Image file too large (max 5 MB)' });
-      return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message || 'Upload failed' });
     }
 
     const file = (req as any).file;

@@ -10,11 +10,13 @@ jest.mock('./cacheService', () => ({
 }));
 
 // Mock OpenAI
+// Create a shared mock for completions.create so all instances use the same mock
+const sharedMockCreate = jest.fn();
 jest.mock('openai', () => {
   return jest.fn().mockImplementation(() => ({
     chat: {
       completions: {
-        create: jest.fn(),
+        create: sharedMockCreate,
       },
     },
   }));
