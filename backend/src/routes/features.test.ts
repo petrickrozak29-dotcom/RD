@@ -61,9 +61,7 @@ describe('Feature Toggle API Routes', () => {
       const mockFeature = { id: '1', name: 'Event', isActive: false };
       (featureToggleService.toggleFeature as jest.Mock).mockResolvedValue(mockFeature);
 
-      const response = await request(app)
-        .patch('/api/features/Event')
-        .send({ isActive: false });
+      const response = await request(app).patch('/api/features/Event').send({ isActive: false });
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockFeature);

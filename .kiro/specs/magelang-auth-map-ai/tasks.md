@@ -130,12 +130,14 @@ Dokumen ini merupakan breakdown dari requirements menjadi implementasi tasks yan
 ### Key Dependencies to Install
 
 Backend:
+
 ```bash
 npm install bcryptjs jsonwebtoken cors zod dotenv redis openai
 npm install -D jest ts-jest supertest @types/jest
 ```
 
 Frontend:
+
 ```bash
 npm install leaflet react-leaflet axios zod
 npm install -D typescript @types/react @types/node
@@ -144,6 +146,7 @@ npm install -D typescript @types/react @types/node
 ### Environment Variables Required
 
 Backend:
+
 ```
 DATABASE_URL=postgresql://user:password@localhost:5432/magelang
 REDIS_URL=redis://localhost:6379
@@ -156,6 +159,7 @@ EMAIL_FROM=noreply@magelang.com
 ```
 
 Frontend:
+
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_MAP_CENTER_LAT=7.4728

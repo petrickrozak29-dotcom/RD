@@ -85,9 +85,7 @@ describe('Category API Routes', () => {
       const mockCategory = { id: '1', name: 'Wisata Alam', featureType: 'WISATA' };
       (categoryService.updateCategory as jest.Mock).mockResolvedValue(mockCategory);
 
-      const response = await request(app)
-        .put('/api/categories/1')
-        .send({ name: 'Wisata Alam' });
+      const response = await request(app).put('/api/categories/1').send({ name: 'Wisata Alam' });
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockCategory);

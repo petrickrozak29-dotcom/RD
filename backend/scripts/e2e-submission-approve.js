@@ -15,8 +15,8 @@
         description: 'E2E test description',
         featureType: 'WISATA',
         categoryName: 'E2E Category',
-        location: 'E2E Location'
-      })
+        location: 'E2E Location',
+      }),
     });
 
     const created = await createRes.json();
@@ -33,7 +33,10 @@
     const loginRes = await fetch(`${base}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'developermagelang45@gmail.com', password: 'potensimagelang45#' })
+      body: JSON.stringify({
+        email: 'developermagelang45@gmail.com',
+        password: 'potensimagelang45#',
+      }),
     });
 
     const loginBody = await loginRes.json();
@@ -50,7 +53,7 @@
     const patchRes = await fetch(`${base}/api/submissions/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ status: 'APPROVED' })
+      body: JSON.stringify({ status: 'APPROVED' }),
     });
 
     const patchBody = await patchRes.json();
@@ -71,7 +74,7 @@
       return;
     }
 
-    const found = Array.isArray(list) ? list.find(i => i.id === id) : null;
+    const found = Array.isArray(list) ? list.find((i) => i.id === id) : null;
 
     if (found) {
       console.log('[E2E] SUCCESS: approved submission is visible in public tourism list');

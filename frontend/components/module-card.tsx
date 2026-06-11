@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -12,7 +12,14 @@ interface ModuleCardProps {
   bgPattern?: string;
 }
 
-export default function ModuleCard({ title, description, icon, href, gradient, bgPattern }: ModuleCardProps) {
+export default function ModuleCard({
+  title,
+  description,
+  icon,
+  href,
+  gradient,
+  bgPattern,
+}: ModuleCardProps) {
   return (
     <motion.div
       whileHover={{ translateY: -12, scale: 1.02 }}
@@ -20,10 +27,10 @@ export default function ModuleCard({ title, description, icon, href, gradient, b
     >
       {/* Background gradient */}
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90`} />
-      
+
       {/* Pattern overlay */}
       {bgPattern && (
-        <div 
+        <div
           className="absolute inset-0 opacity-20"
           style={{ backgroundImage: bgPattern, backgroundSize: '60px 60px' }}
         />

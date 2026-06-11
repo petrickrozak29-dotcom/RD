@@ -12,17 +12,41 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-white mb-3">Eksplor</h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li><Link href="/wisata" className="hover:text-cyan-400">Wisata</Link></li>
-              <li><Link href="/kuliner" className="hover:text-cyan-400">Kuliner</Link></li>
-              <li><Link href="/budaya" className="hover:text-cyan-400">Budaya</Link></li>
+              <li>
+                <Link href="/wisata" className="hover:text-cyan-400">
+                  Wisata
+                </Link>
+              </li>
+              <li>
+                <Link href="/kuliner" className="hover:text-cyan-400">
+                  Kuliner
+                </Link>
+              </li>
+              <li>
+                <Link href="/budaya" className="hover:text-cyan-400">
+                  Budaya
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold text-white mb-3">Fitur</h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li><Link href="/smart-map" className="hover:text-cyan-400">Smart Map</Link></li>
-              <li><Link href="/ai-assistant" className="hover:text-cyan-400">AI Assistant</Link></li>
-              <li><Link href="/event" className="hover:text-cyan-400">Event</Link></li>
+              <li>
+                <Link href="/smart-map" className="hover:text-cyan-400">
+                  Smart Map
+                </Link>
+              </li>
+              <li>
+                <Link href="/ai-assistant" className="hover:text-cyan-400">
+                  AI Assistant
+                </Link>
+              </li>
+              <li>
+                <Link href="/event" className="hover:text-cyan-400">
+                  Event
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

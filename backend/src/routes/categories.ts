@@ -12,7 +12,10 @@ async function authenticateDeveloper(req: Request, res: Response, next: any) {
     if (!token) return res.status(401).json({ error: 'No token provided' });
 
     const decoded = authService.verifyToken(token);
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { role: true, isActive: true } });
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { role: true, isActive: true },
+    });
 
     if (!user || user.role !== 'ADMIN' || !user.isActive) {
       return res.status(403).json({ error: 'Developer access required' });
@@ -40,7 +43,8 @@ router.get('/', async (req: Request, res: Response) => {
 router.post('/', authenticateDeveloper, async (req: Request, res: Response) => {
   try {
     const { name, featureType } = req.body;
-    if (!name || !featureType) return res.status(400).json({ error: 'name and featureType are required' });
+    if (!name || !featureType)
+      return res.status(400).json({ error: 'name and featureType are required' });
 
     const category = await categoryService.createCategory(name, featureType);
     res.status(201).json(category);

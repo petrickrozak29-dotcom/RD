@@ -1,9 +1,9 @@
 /**
  * Cache Service - High-level caching utilities using RedisClient
- * 
+ *
  * Provides convenient methods for caching common data types with
  * appropriate TTL strategies.
- * 
+ *
  * Validates Requirements 14 (Proximity-Based Scoring with caching)
  * and 20 (Real-Time Location Updates with caching)
  */

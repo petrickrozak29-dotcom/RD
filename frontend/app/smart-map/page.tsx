@@ -1,7 +1,15 @@
-"use client";
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ExternalLink, Filter, LocateFixed, MapPin, Navigation, SlidersHorizontal } from 'lucide-react';
+import {
+  CalendarDays,
+  ExternalLink,
+  Filter,
+  LocateFixed,
+  MapPin,
+  Navigation,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
@@ -20,7 +28,7 @@ import {
   type CommunityEvent,
   type EventCategory,
   type MapCategory,
-  type SmartMapItemWithDistance
+  type SmartMapItemWithDistance,
 } from '../../lib/magelang-data';
 
 type SmartFilter = 'semua' | 'event-nearby' | EventCategory;
@@ -29,14 +37,14 @@ type CategoryFilter = 'semua' | MapCategory;
 const smartFilters: Array<{ value: SmartFilter; label: string }> = [
   { value: 'semua', label: 'Semua marker' },
   { value: 'event-nearby', label: 'Event dekat saya' },
-  ...eventCategories.map((category) => ({ value: category, label: category }))
+  ...eventCategories.map((category) => ({ value: category, label: category })),
 ];
 
 const categoryFilters: Array<{ value: CategoryFilter; label: string }> = [
   { value: 'semua', label: 'Semua kategori' },
   { value: 'event', label: 'Event' },
   { value: 'wisata', label: 'Wisata' },
-  { value: 'kuliner', label: 'Kuliner' }
+  { value: 'kuliner', label: 'Kuliner' },
 ];
 
 function categoryClass(category: string) {
@@ -67,7 +75,7 @@ export default function SmartMapPage() {
       async (position) => {
         const coords = {
           lat: position.coords.latitude,
-          lng: position.coords.longitude
+          lng: position.coords.longitude,
         };
 
         setUserLocation(coords);
@@ -79,13 +87,13 @@ export default function SmartMapPage() {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
                 latitude: coords.lat,
                 longitude: coords.lng,
-                accuracy: position.coords.accuracy
-              })
+                accuracy: position.coords.accuracy,
+              }),
             });
           } catch {
             setLocationStatus('Lokasi aktif, sinkron backend belum tersedia');
@@ -153,7 +161,9 @@ export default function SmartMapPage() {
       }
     })();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [apiEvents, userLocation, dataVersion]);
 
   const allItems = asyncItems;
@@ -177,7 +187,8 @@ export default function SmartMapPage() {
   }, [allItems, radius, smartFilter, categoryFilter]);
 
   const nearestEvents = useMemo(
-    () => allItems.filter((item) => item.category === 'event' && item.distance <= radius).slice(0, 5),
+    () =>
+      allItems.filter((item) => item.category === 'event' && item.distance <= radius).slice(0, 5),
     [allItems, radius]
   );
 
@@ -193,9 +204,9 @@ export default function SmartMapPage() {
         latitude: userLocation.lat,
         longitude: userLocation.lng,
         detailUrl: '/smart-map',
-        link: `https://www.google.com/maps/search/?api=1&query=${userLocation.lat},${userLocation.lng}`
+        link: `https://www.google.com/maps/search/?api=1&query=${userLocation.lat},${userLocation.lng}`,
       },
-      ...filteredItems
+      ...filteredItems,
     ],
     [filteredItems, locationStatus, userLocation]
   );
@@ -212,9 +223,12 @@ export default function SmartMapPage() {
                 <MapPin className="h-4 w-4" />
                 Smart Map Magelang
               </p>
-              <h1 className="mt-3 text-4xl font-bold text-white sm:text-5xl">Event, wisata, dan kuliner dalam satu peta</h1>
+              <h1 className="mt-3 text-4xl font-bold text-white sm:text-5xl">
+                Event, wisata, dan kuliner dalam satu peta
+              </h1>
               <p className="mt-4 max-w-3xl text-slate-300">
-                Radius diperbesar 30-50 km untuk menjangkau Kota Magelang, Borobudur, Ketep, dan titik sekitar. Marker event komunitas muncul setelah disetujui developer.
+                Radius diperbesar 30-50 km untuk menjangkau Kota Magelang, Borobudur, Ketep, dan
+                titik sekitar. Marker event komunitas muncul setelah disetujui developer.
               </p>
             </div>
 
@@ -229,9 +243,13 @@ export default function SmartMapPage() {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3 text-sm">
-            <span className="rounded-full border border-slate-700 bg-slate-900/70 px-4 py-2 text-slate-300">{locationStatus}</span>
             <span className="rounded-full border border-slate-700 bg-slate-900/70 px-4 py-2 text-slate-300">
-              {isAuthenticated ? 'Login aktif, event komunitas bisa dikirim' : 'Peta bisa dipakai tanpa login'}
+              {locationStatus}
+            </span>
+            <span className="rounded-full border border-slate-700 bg-slate-900/70 px-4 py-2 text-slate-300">
+              {isAuthenticated
+                ? 'Login aktif, event komunitas bisa dikirim'
+                : 'Peta bisa dipakai tanpa login'}
             </span>
           </div>
         </section>
@@ -291,7 +309,9 @@ export default function SmartMapPage() {
                 className="mt-4 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400"
               >
                 {categoryFilters.map((item) => (
-                  <option key={item.value} value={item.value}>{item.label}</option>
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -309,11 +329,15 @@ export default function SmartMapPage() {
                     className="block rounded-lg border border-slate-800 bg-slate-950/70 p-4 transition hover:border-rose-300/60"
                   >
                     <p className="font-semibold text-white">{item.title}</p>
-                    <p className="mt-1 text-sm text-slate-400">{formatDate(item.date)} - {item.distance.toFixed(1)} km</p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {formatDate(item.date)} - {item.distance.toFixed(1)} km
+                    </p>
                   </a>
                 ))}
                 {nearestEvents.length === 0 && (
-                  <p className="text-sm text-slate-400">Belum ada event dalam radius {radius} km.</p>
+                  <p className="text-sm text-slate-400">
+                    Belum ada event dalam radius {radius} km.
+                  </p>
                 )}
               </div>
             </div>
@@ -326,22 +350,31 @@ export default function SmartMapPage() {
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-300">
               <span>{filteredItems.length} marker aktif dalam filter saat ini</span>
-              <a href="/admin" className="font-semibold text-cyan-300 hover:text-cyan-200">Tambah Community Event</a>
+              <a href="/admin" className="font-semibold text-cyan-300 hover:text-cyan-200">
+                Tambah Community Event
+              </a>
             </div>
 
             <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filteredItems.map((item) => (
-                <article key={item.id} className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/80">
+                <article
+                  key={item.id}
+                  className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/80"
+                >
                   <img src={item.image} alt={item.title} className="h-40 w-full object-cover" />
                   <div className="p-5">
                     <div className="mb-3 flex items-center justify-between gap-3">
-                      <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${categoryClass(item.category)}`}>
+                      <span
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold ${categoryClass(item.category)}`}
+                      >
                         {item.typeLabel}
                       </span>
                       <span className="text-xs text-slate-400">{item.distance.toFixed(1)} km</span>
                     </div>
                     <h2 className="text-xl font-bold text-white">{item.title}</h2>
-                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-300">{item.description}</p>
+                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-300">
+                      {item.description}
+                    </p>
                     <div className="mt-4 space-y-2 text-sm text-slate-400">
                       <p className="flex gap-2">
                         <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
@@ -350,7 +383,10 @@ export default function SmartMapPage() {
                       {item.date && (
                         <p className="flex gap-2">
                           <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" />
-                          <span>{formatDate(item.date)}{item.time ? `, ${item.time}` : ''}</span>
+                          <span>
+                            {formatDate(item.date)}
+                            {item.time ? `, ${item.time}` : ''}
+                          </span>
                         </p>
                       )}
                       <p className="flex gap-2">
@@ -366,7 +402,10 @@ export default function SmartMapPage() {
                         Lihat Detail
                       </a>
                       <a
-                        href={item.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}`}
+                        href={
+                          item.link ||
+                          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}`
+                        }
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"

@@ -11,8 +11,8 @@ async function main() {
         date: '2026-06-11T10:00:00.000Z',
         location: 'Magelang Center',
         description: 'Event created by automated e2e test',
-        image: 'https://example.com/test.jpg'
-      })
+        image: 'https://example.com/test.jpg',
+      }),
     });
     const created = await createResp.json();
     console.log('Created:', created);
@@ -21,7 +21,10 @@ async function main() {
     const loginResp = await fetch(`${base}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'developermagelang45@gmail.com', password: 'potensimagelang45#' })
+      body: JSON.stringify({
+        email: 'developermagelang45@gmail.com',
+        password: 'potensimagelang45#',
+      }),
     });
     const loginJson = await loginResp.json();
     console.log('Login result:', loginJson);
@@ -35,8 +38,8 @@ async function main() {
     console.log('Approving submission as developer...');
     const approveResp = await fetch(`${base}/api/developer/events/${created.id}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ status: 'APPROVED' })
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ status: 'APPROVED' }),
     });
     const approveJson = await approveResp.json();
     console.log('Approve result:', approveJson);
@@ -47,7 +50,9 @@ async function main() {
     console.log('Public events count:', Array.isArray(listJson) ? listJson.length : 0);
 
     console.log('Fetching notifications for developer...');
-    const notiResp = await fetch(`${base}/api/notifications`, { headers: { Authorization: `Bearer ${token}` } });
+    const notiResp = await fetch(`${base}/api/notifications`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const notiJson = await notiResp.json();
     console.log('Notifications:', notiJson);
 

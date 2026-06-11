@@ -41,7 +41,13 @@ router.get('/', async (req: Request, res: Response) => {
     if (submittedById) filters.submittedById = submittedById;
 
     const submissions = await submissionService.getSubmissions(filters);
-    res.json(submissions.map(s => ({ ...s, status: s.status.toLowerCase(), typeLabel: s.category?.name })));
+    res.json(
+      submissions.map((s) => ({
+        ...s,
+        status: s.status.toLowerCase(),
+        typeLabel: s.category?.name,
+      }))
+    );
   } catch (err) {
     res.status(500).json({ error: 'Gagal mengambil submissions' });
   }
@@ -65,7 +71,7 @@ router.post('/', async (req: Request, res: Response) => {
       link: body.link,
       priceRange: body.priceRange,
       date: body.date ? new Date(body.date) : undefined,
-      submittedById: userId ?? body.submittedById
+      submittedById: userId ?? body.submittedById,
     };
 
     const created = await submissionService.createSubmission(input as any);
@@ -81,7 +87,8 @@ router.patch('/:id/status', authenticateAdmin, async (req: Request, res: Respons
   try {
     const { status } = req.body;
     const upper = String(status).toUpperCase();
-    if (!['APPROVED', 'PENDING', 'REJECTED'].includes(upper)) return res.status(400).json({ error: 'Status invalid' });
+    if (!['APPROVED', 'PENDING', 'REJECTED'].includes(upper))
+      return res.status(400).json({ error: 'Status invalid' });
     const updated = await submissionService.updateStatus(req.params.id, upper as any);
     res.json(updated);
   } catch (err) {

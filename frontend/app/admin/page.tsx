@@ -1,7 +1,18 @@
-"use client";
+'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Camera, CheckCircle2, ExternalLink, ImagePlus, Link as LinkIcon, MapPin, ShieldCheck, XCircle, CalendarDays, Ticket } from 'lucide-react';
+import {
+  Camera,
+  CheckCircle2,
+  ExternalLink,
+  ImagePlus,
+  Link as LinkIcon,
+  MapPin,
+  ShieldCheck,
+  XCircle,
+  CalendarDays,
+  Ticket,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import Navbar from '../../components/navbar';
@@ -22,7 +33,7 @@ interface Category {
 export default function CommunityFormPage() {
   const router = useRouter();
   const { user, token, isAuthenticated, loading } = useAuth();
-  
+
   const [featureType, setFeatureType] = useState<FeatureType>('EVENT');
   const [status, setStatus] = useState('');
   const [formState, setFormState] = useState({
@@ -33,7 +44,7 @@ export default function CommunityFormPage() {
     image: '',
     link: '',
     date: '',
-    priceRange: ''
+    priceRange: '',
   });
 
   const [preview, setPreview] = useState(false);
@@ -51,7 +62,7 @@ export default function CommunityFormPage() {
         const names = Array.isArray(cats) ? cats.map((c: any) => c.name) : [];
         if (mounted) {
           setCategoryOptions(names);
-          if (names.length) setFormState(s => ({ ...s, categoryName: names[0] }));
+          if (names.length) setFormState((s) => ({ ...s, categoryName: names[0] }));
         }
       } catch (err) {
         // ignore
@@ -59,7 +70,9 @@ export default function CommunityFormPage() {
     }
 
     loadCategories();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [featureType]);
 
   const isDeveloper = user?.role === 'ADMIN';
@@ -74,8 +87,6 @@ export default function CommunityFormPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    
-
     // If authenticated, attempt to upload to backend uploads endpoint
     (async () => {
       try {
@@ -86,9 +97,9 @@ export default function CommunityFormPage() {
           const res = await fetch(`${getApiBaseUrl()}/api/uploads/image`, {
             method: 'POST',
             headers: {
-              ...(token ? { Authorization: `Bearer ${token}` } : {})
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            body: fd
+            body: fd,
           });
 
           if (res.ok) {
@@ -137,17 +148,17 @@ export default function CommunityFormPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           ...formState,
           featureType,
-          submittedById: user?.id
-        })
+          submittedById: user?.id,
+        }),
       });
 
       if (!response.ok) throw new Error('Gagal menyimpan');
-      
+
       setStatus('Berhasil! Submission masuk antrean review developer.');
       setFormState({
         title: '',
@@ -157,7 +168,7 @@ export default function CommunityFormPage() {
         image: '',
         link: '',
         date: '',
-        priceRange: ''
+        priceRange: '',
       });
       setPreview(false);
     } catch {
@@ -180,8 +191,13 @@ export default function CommunityFormPage() {
         <main className="mx-auto flex min-h-[70vh] max-w-4xl items-center justify-center px-6 py-16 text-center text-white">
           <section className="rounded-lg border border-slate-800 bg-slate-900/80 p-8">
             <h1 className="text-3xl font-bold text-cyan-300">Community Form</h1>
-            <p className="mt-3 text-slate-300">Login diperlukan untuk mengirim rekomendasi event, wisata, atau kuliner.</p>
-            <a href="/login" className="mt-6 inline-block rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 hover:bg-cyan-300">
+            <p className="mt-3 text-slate-300">
+              Login diperlukan untuk mengirim rekomendasi event, wisata, atau kuliner.
+            </p>
+            <a
+              href="/login"
+              className="mt-6 inline-block rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 hover:bg-cyan-300"
+            >
               Login
             </a>
           </section>
@@ -205,7 +221,8 @@ export default function CommunityFormPage() {
           </p>
           <h1 className="mt-3 text-4xl font-bold sm:text-5xl">Ajukan Konten ke Smart Map</h1>
           <p className="mx-auto mt-4 max-w-2xl text-slate-300">
-            Pilih jenis konten, isi detailnya, lalu preview. Konten akan tampil publik setelah disetujui.
+            Pilih jenis konten, isi detailnya, lalu preview. Konten akan tampil publik setelah
+            disetujui.
           </p>
         </section>
 
@@ -213,20 +230,37 @@ export default function CommunityFormPage() {
           {!preview ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid gap-4 md:grid-cols-3">
-                <button type="button" onClick={() => setFeatureType('EVENT')} className={`rounded-lg border p-4 text-center transition ${featureType === 'EVENT' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}>
+                <button
+                  type="button"
+                  onClick={() => setFeatureType('EVENT')}
+                  className={`rounded-lg border p-4 text-center transition ${featureType === 'EVENT' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}
+                >
                   <h3 className="font-bold text-white">Event</h3>
                 </button>
-                <button type="button" onClick={() => setFeatureType('WISATA')} className={`rounded-lg border p-4 text-center transition ${featureType === 'WISATA' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}>
+                <button
+                  type="button"
+                  onClick={() => setFeatureType('WISATA')}
+                  className={`rounded-lg border p-4 text-center transition ${featureType === 'WISATA' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}
+                >
                   <h3 className="font-bold text-white">Wisata</h3>
                 </button>
-                <button type="button" onClick={() => setFeatureType('KULINER')} className={`rounded-lg border p-4 text-center transition ${featureType === 'KULINER' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}>
+                <button
+                  type="button"
+                  onClick={() => setFeatureType('KULINER')}
+                  className={`rounded-lg border p-4 text-center transition ${featureType === 'KULINER' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-700 hover:border-slate-500'}`}
+                >
                   <h3 className="font-bold text-white">Kuliner</h3>
                 </button>
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
-                <Field label={`Nama ${featureType}`} value={formState.title} onChange={(v) => setFormState({ ...formState, title: v })} required />
-                
+                <Field
+                  label={`Nama ${featureType}`}
+                  value={formState.title}
+                  onChange={(v) => setFormState({ ...formState, title: v })}
+                  required
+                />
+
                 <label className="block text-sm font-semibold text-slate-200">
                   Kategori
                   <select
@@ -234,18 +268,39 @@ export default function CommunityFormPage() {
                     onChange={(e) => setFormState({ ...formState, categoryName: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
                   >
-                    {categoryOptions.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    {categoryOptions.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </label>
 
-                <Field label="Lokasi" value={formState.location} onChange={(v) => setFormState({ ...formState, location: v })} required />
-                
+                <Field
+                  label="Lokasi"
+                  value={formState.location}
+                  onChange={(v) => setFormState({ ...formState, location: v })}
+                  required
+                />
+
                 {featureType === 'EVENT' && (
-                  <Field label="Tanggal Event" type="date" value={formState.date} onChange={(v) => setFormState({ ...formState, date: v })} required />
+                  <Field
+                    label="Tanggal Event"
+                    type="date"
+                    value={formState.date}
+                    onChange={(v) => setFormState({ ...formState, date: v })}
+                    required
+                  />
                 )}
-                
+
                 {featureType === 'KULINER' && (
-                  <Field label="Rentang Harga" placeholder="Contoh: Rp 15.000 - Rp 50.000" value={formState.priceRange} onChange={(v) => setFormState({ ...formState, priceRange: v })} required />
+                  <Field
+                    label="Rentang Harga"
+                    placeholder="Contoh: Rp 15.000 - Rp 50.000"
+                    value={formState.priceRange}
+                    onChange={(v) => setFormState({ ...formState, priceRange: v })}
+                    required
+                  />
                 )}
 
                 <label className="block text-sm font-semibold text-slate-200 md:col-span-2">
@@ -263,23 +318,40 @@ export default function CommunityFormPage() {
                   Upload Gambar
                   <span className="mt-2 flex items-center gap-3 rounded-lg border border-dashed border-slate-700 bg-slate-950 px-4 py-3 text-slate-400">
                     <ImagePlus className="h-5 w-5 text-cyan-300" />
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full text-sm"
+                    />
                   </span>
                 </label>
-                
-                <Field label="Link Terkait (Google Maps / IG / Web)" value={formState.link} onChange={(v) => setFormState({ ...formState, link: v })} placeholder="https://..." />
+
+                <Field
+                  label="Link Terkait (Google Maps / IG / Web)"
+                  value={formState.link}
+                  onChange={(v) => setFormState({ ...formState, link: v })}
+                  placeholder="https://..."
+                />
               </div>
 
-              <button type="submit" className="w-full rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300">
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-cyan-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300"
+              >
                 Lanjutkan ke Preview
               </button>
             </form>
           ) : (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold border-b border-slate-700 pb-2">Preview Submission</h2>
-              
+              <h2 className="text-xl font-bold border-b border-slate-700 pb-2">
+                Preview Submission
+              </h2>
+
               <article className="overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
-                {formState.image && <img src={formState.image} alt="Preview" className="h-48 w-full object-cover" />}
+                {formState.image && (
+                  <img src={formState.image} alt="Preview" className="h-48 w-full object-cover" />
+                )}
                 <div className="p-5">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200">
@@ -288,27 +360,51 @@ export default function CommunityFormPage() {
                   </div>
                   <h3 className="text-2xl font-bold text-white">{formState.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-300">{formState.description}</p>
-                  
+
                   <div className="mt-4 space-y-2 text-sm text-slate-400">
-                    <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-cyan-300" /> {formState.location}</p>
-                    {featureType === 'EVENT' && <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-amber-300" /> {formState.date}</p>}
-                    {featureType === 'KULINER' && <p className="flex items-center gap-2"><Ticket className="h-4 w-4 text-emerald-300" /> {formState.priceRange}</p>}
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-cyan-300" /> {formState.location}
+                    </p>
+                    {featureType === 'EVENT' && (
+                      <p className="flex items-center gap-2">
+                        <CalendarDays className="h-4 w-4 text-amber-300" /> {formState.date}
+                      </p>
+                    )}
+                    {featureType === 'KULINER' && (
+                      <p className="flex items-center gap-2">
+                        <Ticket className="h-4 w-4 text-emerald-300" /> {formState.priceRange}
+                      </p>
+                    )}
                   </div>
                 </div>
               </article>
 
               <div className="flex gap-4">
-                <button type="button" onClick={() => setPreview(false)} className="w-full rounded-lg border border-slate-600 bg-slate-800 px-6 py-3 font-semibold text-white transition hover:bg-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setPreview(false)}
+                  className="w-full rounded-lg border border-slate-600 bg-slate-800 px-6 py-3 font-semibold text-white transition hover:bg-slate-700"
+                >
                   Edit Kembali
                 </button>
-                <button type="button" onClick={handleSubmit} className="w-full rounded-lg bg-emerald-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-300">
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="w-full rounded-lg bg-emerald-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-300"
+                >
                   Submit Sekarang
                 </button>
               </div>
             </div>
           )}
 
-          {status && <p className={`mt-5 rounded-lg p-4 text-center font-semibold ${status.includes('Gagal') ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}`}>{status}</p>}
+          {status && (
+            <p
+              className={`mt-5 rounded-lg p-4 text-center font-semibold ${status.includes('Gagal') ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'}`}
+            >
+              {status}
+            </p>
+          )}
         </section>
       </main>
       <Footer />
@@ -322,7 +418,7 @@ function Field({
   onChange,
   placeholder,
   required = false,
-  type = 'text'
+  type = 'text',
 }: {
   label: string;
   value: string;

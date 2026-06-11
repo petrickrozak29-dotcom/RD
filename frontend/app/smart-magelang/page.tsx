@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -15,7 +15,7 @@ import {
   Send,
   Sparkles,
   Utensils,
-  Wifi
+  Wifi,
 } from 'lucide-react';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
@@ -63,64 +63,87 @@ interface ItineraryResult {
 const tabs: Array<{ key: SmartTab; label: string; icon: any }> = [
   { key: 'ai', label: 'AI Assistant', icon: Bot },
   { key: 'technology', label: 'Teknologi Kota', icon: Cpu },
-  { key: 'potential', label: 'Potensi Modern', icon: Rocket }
+  { key: 'potential', label: 'Potensi Modern', icon: Rocket },
 ];
 
 const technologyItems = [
   {
     title: 'Infrastruktur Teknologi',
-    description: 'Fondasi perangkat, pusat data, sensor, dan sistem informasi kota untuk mendukung pengambilan keputusan berbasis data.',
+    description:
+      'Fondasi perangkat, pusat data, sensor, dan sistem informasi kota untuk mendukung pengambilan keputusan berbasis data.',
     icon: Building2,
-    details: ['Basis data wisata, event, kuliner', 'Integrasi koordinat dan marker Smart Map', 'Dashboard moderasi konten developer']
+    details: [
+      'Basis data wisata, event, kuliner',
+      'Integrasi koordinat dan marker Smart Map',
+      'Dashboard moderasi konten developer',
+    ],
   },
   {
     title: 'Internet dan Jaringan Komunikasi',
-    description: 'Konektivitas publik, akses informasi, dan jaringan komunikasi yang membantu wisatawan maupun masyarakat bergerak lebih mudah.',
+    description:
+      'Konektivitas publik, akses informasi, dan jaringan komunikasi yang membantu wisatawan maupun masyarakat bergerak lebih mudah.',
     icon: Wifi,
-    details: ['Akses peta dan rute dari perangkat mobile', 'Kanal publikasi agenda komunitas', 'Tautan Google Maps dan sosial media usaha']
+    details: [
+      'Akses peta dan rute dari perangkat mobile',
+      'Kanal publikasi agenda komunitas',
+      'Tautan Google Maps dan sosial media usaha',
+    ],
   },
   {
     title: 'Digitalisasi Layanan Publik',
-    description: 'Layanan administrasi, informasi kota, aduan, event, dan promosi lokal diarahkan agar bisa diakses dari kanal digital.',
+    description:
+      'Layanan administrasi, informasi kota, aduan, event, dan promosi lokal diarahkan agar bisa diakses dari kanal digital.',
     icon: Network,
-    details: ['Pengajuan event oleh user', 'Pengajuan kuliner/UMKM', 'Profil user dengan riwayat publish']
+    details: [
+      'Pengajuan event oleh user',
+      'Pengajuan kuliner/UMKM',
+      'Profil user dengan riwayat publish',
+    ],
   },
   {
     title: 'Pengembangan Smart City',
-    description: 'Integrasi Smart Map, event, kuliner, lokasi, dan rekomendasi perjalanan sebagai pondasi portal Smart Tourism & Smart City.',
+    description:
+      'Integrasi Smart Map, event, kuliner, lokasi, dan rekomendasi perjalanan sebagai pondasi portal Smart Tourism & Smart City.',
     icon: Lightbulb,
-    details: ['AI itinerary berdasarkan minat', 'Event aktif otomatis tampil/hilang sesuai tanggal', 'Histori tetap tersedia untuk developer']
-  }
+    details: [
+      'AI itinerary berdasarkan minat',
+      'Event aktif otomatis tampil/hilang sesuai tanggal',
+      'Histori tetap tersedia untuk developer',
+    ],
+  },
 ];
 
 const potentialItems = [
   {
     title: 'Potensi Pariwisata Magelang',
-    description: 'Magelang punya kekuatan heritage Borobudur, wisata alam, ruang kota, event, dan jalur budaya yang bisa dikemas sebagai perjalanan digital.',
-    href: '/wisata'
+    description:
+      'Magelang punya kekuatan heritage Borobudur, wisata alam, ruang kota, event, dan jalur budaya yang bisa dikemas sebagai perjalanan digital.',
+    href: '/wisata',
   },
   {
     title: 'Potensi Investasi Magelang',
-    description: 'Kawasan Borobudur dan koridor pariwisata sekitarnya membuka peluang hospitality, MICE, transportasi wisata, produk lokal, dan layanan digital pendukung.',
-    href: 'https://bob.kemenparekraf.go.id/'
+    description:
+      'Kawasan Borobudur dan koridor pariwisata sekitarnya membuka peluang hospitality, MICE, transportasi wisata, produk lokal, dan layanan digital pendukung.',
+    href: 'https://bob.kemenparekraf.go.id/',
   },
   {
     title: 'Ekonomi Kreatif Magelang',
-    description: 'UMKM kuliner dan produk kreatif bisa mengajukan promosi. Setelah disetujui developer, usaha tampil di kategori UMKM pada fitur kuliner dan Smart Map.',
-    href: '/kuliner'
-  }
+    description:
+      'UMKM kuliner dan produk kreatif bisa mengajukan promosi. Setelah disetujui developer, usaha tampil di kategori UMKM pada fitur kuliner dan Smart Map.',
+    href: '/kuliner',
+  },
 ];
 
 const interestOptions = [
   { value: 'wisata', label: 'Wisata', icon: MapPin },
   { value: 'kuliner', label: 'Kuliner', icon: Utensils },
-  { value: 'event', label: 'Event', icon: Sparkles }
+  { value: 'event', label: 'Event', icon: Sparkles },
 ];
 
 function timeLabel(value: string) {
   return new Date(value).toLocaleTimeString('id-ID', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 }
 
@@ -143,7 +166,7 @@ export default function SmartMagelangPage() {
       (position) => {
         setLocation({
           lat: position.coords.latitude,
-          lng: position.coords.longitude
+          lng: position.coords.longitude,
         });
         setLocationStatus('Lokasi perangkat aktif');
       },
@@ -161,11 +184,9 @@ export default function SmartMagelangPage() {
   }, [departureTime, duration]);
 
   const toggleInterest = (value: string) => {
-    setInterests((current) => (
-      current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value]
-    ));
+    setInterests((current) =>
+      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
+    );
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -199,15 +220,15 @@ export default function SmartMagelangPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           duration: Number(duration),
           startTime: start.toISOString(),
           interests,
           latitude: location.lat,
-          longitude: location.lng
-        })
+          longitude: location.lng,
+        }),
       });
 
       if (!response.ok) {
@@ -236,7 +257,8 @@ export default function SmartMagelangPage() {
           </p>
           <h1 className="mt-3 text-4xl font-bold sm:text-5xl">Smart Magelang</h1>
           <p className="mt-4 max-w-3xl text-slate-300">
-            Pusat fitur digital Magelang untuk AI itinerary, teknologi kota, potensi pariwisata, investasi, dan ekonomi kreatif berbasis UMKM.
+            Pusat fitur digital Magelang untuk AI itinerary, teknologi kota, potensi pariwisata,
+            investasi, dan ekonomi kreatif berbasis UMKM.
           </p>
         </section>
 
@@ -263,13 +285,17 @@ export default function SmartMagelangPage() {
 
         {activeTab === 'ai' && (
           <section className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
-            <form onSubmit={handleSubmit} className="rounded-lg border border-slate-800 bg-slate-900/85 p-6">
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-lg border border-slate-800 bg-slate-900/85 p-6"
+            >
               <h2 className="flex items-center gap-2 text-2xl font-semibold">
                 <Bot className="h-6 w-6 text-cyan-300" />
                 AI Assistant
               </h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                Masukkan jam mulai, waktu yang tersedia, dan minat. AI akan menyusun rekomendasi dari titik terdekat dulu.
+                Masukkan jam mulai, waktu yang tersedia, dan minat. AI akan menyusun rekomendasi
+                dari titik terdekat dulu.
               </p>
 
               <div className="mt-6 space-y-5">
@@ -355,9 +381,12 @@ export default function SmartMagelangPage() {
               {!result ? (
                 <div className="flex min-h-[420px] flex-col justify-center">
                   <Navigation className="h-12 w-12 text-cyan-300" />
-                  <h2 className="mt-5 text-3xl font-semibold">Rekomendasi rute akan tampil di sini</h2>
+                  <h2 className="mt-5 text-3xl font-semibold">
+                    Rekomendasi rute akan tampil di sini
+                  </h2>
                   <p className="mt-3 max-w-xl text-slate-400">
-                    Hasil akan berisi itinerary, jarak, waktu tempuh, estimasi durasi, dan urutan destinasi yang diprioritaskan dari yang terdekat.
+                    Hasil akan berisi itinerary, jarak, waktu tempuh, estimasi durasi, dan urutan
+                    destinasi yang diprioritaskan dari yang terdekat.
                   </p>
                 </div>
               ) : (
@@ -369,20 +398,33 @@ export default function SmartMagelangPage() {
 
                   <div className="mb-6 grid gap-3 sm:grid-cols-3">
                     <Stat label="Jarak Total" value={`${result.totalDistance.toFixed(1)} km`} />
-                    <Stat label="Waktu Rute" value={`${Math.floor(result.totalDuration / 60)}j ${result.totalDuration % 60}m`} />
-                    <Stat label="Estimasi Biaya" value={`Rp ${result.totalCost.toLocaleString('id-ID')}`} />
+                    <Stat
+                      label="Waktu Rute"
+                      value={`${Math.floor(result.totalDuration / 60)}j ${result.totalDuration % 60}m`}
+                    />
+                    <Stat
+                      label="Estimasi Biaya"
+                      value={`Rp ${result.totalCost.toLocaleString('id-ID')}`}
+                    />
                   </div>
 
                   <div className="space-y-4">
                     {result.itinerary.map((item) => (
-                      <article key={`${item.order}-${item.destination.name}`} className="rounded-lg border border-slate-800 bg-slate-950/75 p-5">
+                      <article
+                        key={`${item.order}-${item.destination.name}`}
+                        className="rounded-lg border border-slate-800 bg-slate-950/75 p-5"
+                      >
                         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                           <div>
                             <p className="text-sm font-semibold text-cyan-300">
                               {item.order}. {timeLabel(item.startTime)} - {timeLabel(item.endTime)}
                             </p>
-                            <h3 className="mt-2 text-xl font-semibold text-white">{item.destination.name}</h3>
-                            <p className="mt-2 text-sm leading-6 text-slate-400">{item.destination.description}</p>
+                            <h3 className="mt-2 text-xl font-semibold text-white">
+                              {item.destination.name}
+                            </h3>
+                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                              {item.destination.description}
+                            </p>
                           </div>
                           <span className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200">
                             {item.destination.category || 'Rekomendasi'}
@@ -396,14 +438,20 @@ export default function SmartMagelangPage() {
                         <p className="mt-3 text-sm text-slate-500">{item.directions}</p>
                         <div className="mt-4 flex flex-wrap gap-3">
                           <a
-                            href={item.destination.detailUrl || `/smart-map?focus=${item.destination.mapId || item.destination.id || encodeURIComponent(item.destination.name)}`}
+                            href={
+                              item.destination.detailUrl ||
+                              `/smart-map?focus=${item.destination.mapId || item.destination.id || encodeURIComponent(item.destination.name)}`
+                            }
                             className="inline-flex items-center gap-2 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300"
                           >
                             <MapPin className="h-4 w-4" />
                             Lihat di Smart Map
                           </a>
                           <a
-                            href={item.destination.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.destination.name)}`}
+                            href={
+                              item.destination.link ||
+                              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.destination.name)}`
+                            }
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-cyan-200 hover:border-cyan-300"
@@ -437,7 +485,10 @@ export default function SmartMagelangPage() {
             {technologyItems.map((item) => {
               const Icon = item.icon;
               return (
-                <article key={item.title} className="rounded-lg border border-slate-800 bg-slate-900/85 p-6">
+                <article
+                  key={item.title}
+                  className="rounded-lg border border-slate-800 bg-slate-900/85 p-6"
+                >
                   <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-400/15 text-cyan-200">
                     <Icon className="h-5 w-5" />
                   </div>
@@ -445,7 +496,10 @@ export default function SmartMagelangPage() {
                   <p className="mt-3 leading-7 text-slate-300">{item.description}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {item.details.map((detail) => (
-                      <span key={detail} className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs text-cyan-100">
+                      <span
+                        key={detail}
+                        className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs text-cyan-100"
+                      >
                         {detail}
                       </span>
                     ))}
@@ -459,7 +513,11 @@ export default function SmartMagelangPage() {
         {activeTab === 'potential' && (
           <section className="grid gap-5 md:grid-cols-3">
             {potentialItems.map((item) => (
-              <a key={item.title} href={item.href} className="rounded-lg border border-slate-800 bg-slate-900/85 p-6 transition hover:border-cyan-300/60">
+              <a
+                key={item.title}
+                href={item.href}
+                className="rounded-lg border border-slate-800 bg-slate-900/85 p-6 transition hover:border-cyan-300/60"
+              >
                 <h2 className="text-2xl font-semibold text-white">{item.title}</h2>
                 <p className="mt-3 leading-7 text-slate-300">{item.description}</p>
               </a>

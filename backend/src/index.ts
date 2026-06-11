@@ -59,7 +59,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.get('/api/health', async (_req, res) => {
   const redisStatus = redisClient.getStatus();
   const redisHealthy = await redisClient.healthCheck();
-  
+
   // Check OpenAI status
   let openaiHealthy = false;
   try {
@@ -70,19 +70,21 @@ app.get('/api/health', async (_req, res) => {
     // OpenAI client not initialized or failed health check
     openaiHealthy = false;
   }
-  
+
   res.json({
     status: 'ok',
     service: 'MAGELANGVERSE-ID backend',
     redis: {
       connected: redisStatus.isConnected,
       usesFallback: redisStatus.usesFallback,
-      healthy: redisHealthy
+      healthy: redisHealthy,
     },
     openai: {
-      configured: !!process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'sk-your-openai-api-key-here',
-      healthy: openaiHealthy
-    }
+      configured:
+        !!process.env.OPENAI_API_KEY &&
+        process.env.OPENAI_API_KEY !== 'sk-your-openai-api-key-here',
+      healthy: openaiHealthy,
+    },
   });
 });
 
@@ -101,25 +103,25 @@ app.get('/', (_req, res) => {
       '/api/auth',
       '/api/developer',
       '/api/locations',
-      '/api/recommendations'
-    ]
+      '/api/recommendations',
+    ],
   });
 });
 
 const server = app.listen(port, async () => {
   console.log(`Backend running on http://localhost:${port}`);
-  
+
   // Initialize Redis connection
   console.log('[Startup] Initializing Redis connection...');
   await redisClient.connect();
-  
+
   const status = redisClient.getStatus();
   if (status.usesFallback) {
     console.warn('[Startup] ⚠️  Using in-memory cache fallback (Redis unavailable)');
   } else {
     console.log('[Startup] ✓ Redis connected successfully');
   }
-  
+
   // Initialize OpenAI client
   console.log('[Startup] Initializing OpenAI client...');
   try {

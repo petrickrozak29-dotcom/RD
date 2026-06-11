@@ -2,28 +2,28 @@ import { createClient, RedisClientType } from 'redis';
 
 /**
  * RedisClient Wrapper with Connection Pooling, Error Handling, and Fallback
- * 
+ *
  * Features:
  * - Automatic connection management with retry logic
  * - Graceful fallback to in-memory cache when Redis unavailable
  * - TTL strategies for different data types
  * - Error handling and logging
  * - Connection pooling support
- * 
- * Validates Requirements 14 (Proximity-Based Scoring with caching) 
+ *
+ * Validates Requirements 14 (Proximity-Based Scoring with caching)
  * and 20 (Real-Time Location Updates with caching)
  */
 
 // TTL strategies (in seconds)
 export const CacheTTL = {
-  LOCATION_CURRENT: 60,          // 1 minute - current user location
-  LOCATION_HISTORY: 300,         // 5 minutes - location history
-  NEARBY_DESTINATIONS: 300,      // 5 minutes - nearby destinations list
-  DESTINATION_DISTANCE: 300,     // 5 minutes - calculated distances
-  RECOMMENDATIONS: 1800,         // 30 minutes - recommendation scores
-  AI_INSIGHTS: 86400,            // 24 hours - AI-generated insights
-  USER_PREFERENCES: 600,         // 10 minutes - user preferences
-  SESSION: 900,                  // 15 minutes - session data
+  LOCATION_CURRENT: 60, // 1 minute - current user location
+  LOCATION_HISTORY: 300, // 5 minutes - location history
+  NEARBY_DESTINATIONS: 300, // 5 minutes - nearby destinations list
+  DESTINATION_DISTANCE: 300, // 5 minutes - calculated distances
+  RECOMMENDATIONS: 1800, // 30 minutes - recommendation scores
+  AI_INSIGHTS: 86400, // 24 hours - AI-generated insights
+  USER_PREFERENCES: 600, // 10 minutes - user preferences
+  SESSION: 900, // 15 minutes - session data
 } as const;
 
 // In-memory fallback cache
@@ -51,12 +51,12 @@ class InMemoryCache {
   get(key: string): string | null {
     const entry = this.cache.get(key);
     if (!entry) return null;
-    
+
     if (Date.now() > entry.expiresAt) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return entry.value;
   }
 
@@ -101,7 +101,7 @@ class RedisClientWrapper {
    */
   async connect(): Promise<void> {
     const redisUrl = process.env.REDIS_URL;
-    
+
     // If Redis URL not configured, use fallback immediately
     if (!redisUrl) {
       console.warn('[Redis] REDIS_URL not configured. Using in-memory fallback cache.');
@@ -160,7 +160,6 @@ class RedisClientWrapper {
 
       // Connect to Redis
       await this.client.connect();
-      
     } catch (error: any) {
       console.error('[Redis] Failed to connect:', error.message);
       this.switchToFallback();
@@ -174,7 +173,7 @@ class RedisClientWrapper {
     console.warn('[Redis] Switching to in-memory fallback cache');
     this.usesFallback = true;
     this.isConnected = true; // Mark as connected to allow operations
-    
+
     if (this.client) {
       this.client.disconnect().catch(() => {
         // Ignore disconnect errors
@@ -247,7 +246,7 @@ class RedisClientWrapper {
   async getJSON<T>(key: string): Promise<T | null> {
     const value = await this.get(key);
     if (!value) return null;
-    
+
     try {
       return JSON.parse(value) as T;
     } catch (error: any) {
@@ -283,13 +282,13 @@ class RedisClientWrapper {
       // For in-memory cache, manually match and delete
       const keys = Array.from(this.fallbackCache['cache'].keys());
       const regex = new RegExp(pattern.replace('*', '.*'));
-      keys.filter(k => regex.test(k)).forEach(k => this.fallbackCache.delete(k));
+      keys.filter((k) => regex.test(k)).forEach((k) => this.fallbackCache.delete(k));
       return;
     }
 
     try {
       if (!this.client) return;
-      
+
       const keys = await this.client.keys(pattern);
       if (keys.length > 0) {
         await this.client.del(keys);

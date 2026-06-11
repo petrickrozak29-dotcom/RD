@@ -12,7 +12,7 @@ app.get('/api/submissions', async (req, res) => {
     const submissions = await submissionService.getSubmissions({
       featureType: featureType as string,
       status: status as string,
-      submittedById: submittedById as string
+      submittedById: submittedById as string,
     });
     res.json(submissions);
   } catch (error) {
@@ -67,7 +67,7 @@ describe('Submission API Routes', () => {
       expect(submissionService.getSubmissions).toHaveBeenCalledWith({
         featureType: 'EVENT',
         status: undefined,
-        submittedById: undefined
+        submittedById: undefined,
       });
     });
   });
@@ -76,12 +76,10 @@ describe('Submission API Routes', () => {
     it('should create a new submission and return 201', async () => {
       const mockSubmission = { id: '1', title: 'New Wisata', status: 'PENDING' };
       const input = { title: 'New Wisata', featureType: 'WISATA', categoryName: 'Alam' };
-      
+
       (submissionService.createSubmission as jest.Mock).mockResolvedValue(mockSubmission);
 
-      const response = await request(app)
-        .post('/api/submissions')
-        .send(input);
+      const response = await request(app).post('/api/submissions').send(input);
 
       expect(response.status).toBe(201);
       expect(response.body).toEqual(mockSubmission);

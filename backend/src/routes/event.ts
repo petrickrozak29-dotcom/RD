@@ -16,9 +16,9 @@ router.get('/', async (req, res) => {
     if (q) filters.q = q;
 
     const events = await submissionService.getSubmissions(filters);
-    
+
     // Map Prisma Submission back to what the frontend expects
-    const mappedEvents = events.map(event => ({
+    const mappedEvents = events.map((event) => ({
       id: event.id,
       title: event.title,
       description: event.description,
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
       typeLabel: event.category?.name,
       status: event.status.toLowerCase(), // Frontend expects 'approved', 'pending', 'rejected'
       submittedBy: event.submittedBy?.email || event.submittedById,
-      createdAt: event.createdAt.toISOString()
+      createdAt: event.createdAt.toISOString(),
     }));
 
     res.json(mappedEvents);
@@ -55,11 +55,13 @@ router.post('/', async (req, res) => {
       longitude,
       category,
       typeLabel,
-      submittedById
+      submittedById,
     } = req.body;
 
     if (!title || !date || !location || !description) {
-      return res.status(400).json({ error: 'Judul, tanggal, lokasi, dan deskripsi event harus diisi.' });
+      return res
+        .status(400)
+        .json({ error: 'Judul, tanggal, lokasi, dan deskripsi event harus diisi.' });
     }
 
     const newEvent = await submissionService.createSubmission({
@@ -70,10 +72,12 @@ router.post('/', async (req, res) => {
       location,
       latitude: typeof latitude === 'number' ? latitude : -7.4797,
       longitude: typeof longitude === 'number' ? longitude : 110.2177,
-      image: image || 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
+      image:
+        image ||
+        'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
       link,
       date: new Date(date),
-      submittedById
+      submittedById,
     });
 
     res.status(201).json({ ...newEvent, status: newEvent.status.toLowerCase() });

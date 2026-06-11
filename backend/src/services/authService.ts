@@ -31,12 +31,12 @@ interface LoginResponse {
 // Password strength validation helper
 export function validatePasswordStrength(password: string): boolean {
   if (password.length < 8) return false;
-  
+
   const hasUppercase = /[A-Z]/.test(password);
   const hasLowercase = /[a-z]/.test(password);
   const hasDigit = /\d/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
+
   return hasUppercase && hasLowercase && hasDigit && hasSpecialChar;
 }
 
@@ -63,7 +63,7 @@ export async function register(input: RegisterInput): Promise<LoginResponse> {
 
   // Check if email already exists
   const existingUser = await prisma.user.findUnique({
-    where: { email }
+    where: { email },
   });
 
   if (existingUser) {
@@ -87,9 +87,9 @@ export async function register(input: RegisterInput): Promise<LoginResponse> {
           mobilityLevel: 5,
           maxSpendPerDay: 0,
           distancePreference: 5,
-          language: 'id'
-        }
-      }
+          language: 'id',
+        },
+      },
     },
     select: {
       id: true,
@@ -97,16 +97,14 @@ export async function register(input: RegisterInput): Promise<LoginResponse> {
       name: true,
       avatar: true,
       bio: true,
-      role: true
-    }
+      role: true,
+    },
   });
 
   // Generate tokens
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    JWT_SECRET,
-    { expiresIn: parseInt(JWT_EXPIRE) }
-  );
+  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+    expiresIn: parseInt(JWT_EXPIRE),
+  });
 
   const refreshToken = jwt.sign(
     { userId: user.id, email: user.email, type: 'refresh' },
@@ -118,7 +116,7 @@ export async function register(input: RegisterInput): Promise<LoginResponse> {
     token,
     refreshToken,
     user,
-    expiresIn: parseInt(JWT_EXPIRE)
+    expiresIn: parseInt(JWT_EXPIRE),
   };
 }
 
@@ -133,7 +131,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
         name: 'Developer Magelang',
         role: 'ADMIN',
         isActive: true,
-        lastLogin: new Date()
+        lastLogin: new Date(),
       },
       create: {
         email: DEVELOPER_EMAIL,
@@ -149,16 +147,16 @@ export async function login(email: string, password: string): Promise<LoginRespo
             mobilityLevel: 5,
             maxSpendPerDay: 0,
             distancePreference: 5,
-            language: 'id'
-          }
-        }
-      }
+            language: 'id',
+          },
+        },
+      },
     });
   }
 
   // Query user by email
   const user = await prisma.user.findUnique({
-    where: { email: email.toLowerCase() === DEVELOPER_EMAIL ? DEVELOPER_EMAIL : email }
+    where: { email: email.toLowerCase() === DEVELOPER_EMAIL ? DEVELOPER_EMAIL : email },
   });
 
   if (!user) {
@@ -179,15 +177,13 @@ export async function login(email: string, password: string): Promise<LoginRespo
   // Update last login
   await prisma.user.update({
     where: { id: user.id },
-    data: { lastLogin: new Date() }
+    data: { lastLogin: new Date() },
   });
 
   // Generate JWT tokens
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    JWT_SECRET,
-    { expiresIn: parseInt(JWT_EXPIRE) }
-  );
+  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+    expiresIn: parseInt(JWT_EXPIRE),
+  });
 
   const refreshToken = jwt.sign(
     { userId: user.id, email: user.email, type: 'refresh' },
@@ -204,9 +200,9 @@ export async function login(email: string, password: string): Promise<LoginRespo
       name: user.name,
       avatar: user.avatar,
       bio: user.bio,
-      role: user.role
+      role: user.role,
     },
-    expiresIn: parseInt(JWT_EXPIRE)
+    expiresIn: parseInt(JWT_EXPIRE),
   };
 }
 
@@ -227,7 +223,9 @@ export function verifyToken(token: string): TokenPayload {
   }
 }
 
-export async function refreshAccessToken(refreshToken: string): Promise<{ token: string; expiresIn: number }> {
+export async function refreshAccessToken(
+  refreshToken: string
+): Promise<{ token: string; expiresIn: number }> {
   try {
     const decoded = jwt.verify(refreshToken, JWT_SECRET) as TokenPayload;
 
@@ -236,15 +234,13 @@ export async function refreshAccessToken(refreshToken: string): Promise<{ token:
     }
 
     // Generate new access token
-    const newToken = jwt.sign(
-      { userId: decoded.userId, email: decoded.email },
-      JWT_SECRET,
-      { expiresIn: parseInt(JWT_EXPIRE) }
-    );
+    const newToken = jwt.sign({ userId: decoded.userId, email: decoded.email }, JWT_SECRET, {
+      expiresIn: parseInt(JWT_EXPIRE),
+    });
 
     return {
       token: newToken,
-      expiresIn: parseInt(JWT_EXPIRE)
+      expiresIn: parseInt(JWT_EXPIRE),
     };
   } catch (error) {
     throw new Error('Invalid or expired refresh token');
@@ -266,8 +262,8 @@ export async function getProfile(userId: string) {
       name: true,
       avatar: true,
       bio: true,
-      role: true
-    }
+      role: true,
+    },
   });
 
   if (!user) {
@@ -290,7 +286,7 @@ export async function updateProfile(
     data: {
       ...(input.name !== undefined ? { name: input.name.trim() } : {}),
       ...(input.bio !== undefined ? { bio: input.bio.trim() } : {}),
-      ...(input.avatar !== undefined ? { avatar: input.avatar.trim() || null } : {})
+      ...(input.avatar !== undefined ? { avatar: input.avatar.trim() || null } : {}),
     },
     select: {
       id: true,
@@ -298,18 +294,14 @@ export async function updateProfile(
       name: true,
       avatar: true,
       bio: true,
-      role: true
-    }
+      role: true,
+    },
   });
 
   return user;
 }
 
-export async function changePassword(
-  userId: string,
-  currentPassword: string,
-  newPassword: string
-) {
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   if (!validatePasswordStrength(newPassword)) {
     throw new Error(
       'Password must be at least 8 characters and contain uppercase, lowercase, digit, and special character'
@@ -317,7 +309,7 @@ export async function changePassword(
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: userId }
+    where: { id: userId },
   });
 
   if (!user) {
@@ -334,6 +326,6 @@ export async function changePassword(
 
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash }
+    data: { passwordHash },
   });
 }

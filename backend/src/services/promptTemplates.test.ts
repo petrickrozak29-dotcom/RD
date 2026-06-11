@@ -41,9 +41,7 @@ describe('PromptTemplates', () => {
     it('should include budget level in prompt', () => {
       const params = {
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test Destination', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test Destination', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'budget' as const,
@@ -60,9 +58,7 @@ describe('PromptTemplates', () => {
     it('should include premium budget in prompt', () => {
       const params = {
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test Destination', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test Destination', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'premium' as const,
@@ -79,9 +75,7 @@ describe('PromptTemplates', () => {
     it('should include start time if provided', () => {
       const params = {
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test Destination', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test Destination', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'moderate' as const,
@@ -98,9 +92,7 @@ describe('PromptTemplates', () => {
     it('should handle destinations without description', () => {
       const params = {
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test Destination', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test Destination', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'moderate' as const,
@@ -117,9 +109,7 @@ describe('PromptTemplates', () => {
     it('should format multiple interests correctly', () => {
       const params = {
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test Destination', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test Destination', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture', 'nature', 'food'],
           budgetLevel: 'moderate' as const,
@@ -135,9 +125,7 @@ describe('PromptTemplates', () => {
     it('should request JSON output format', () => {
       const params = {
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test Destination', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test Destination', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'moderate' as const,
@@ -251,9 +239,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 2,
         },
-        destinations: [
-          { name: 'Test Place', category: 'culture', distance: 1.0, score: 80 },
-        ],
+        destinations: [{ name: 'Test Place', category: 'culture', distance: 1.0, score: 80 }],
         limit: 5,
       };
 
@@ -270,9 +256,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 5,
         },
-        destinations: [
-          { name: 'Test Place', category: 'culture', distance: 1.0, score: 80 },
-        ],
+        destinations: [{ name: 'Test Place', category: 'culture', distance: 1.0, score: 80 }],
         limit: 5,
       };
 
@@ -289,9 +273,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 9,
         },
-        destinations: [
-          { name: 'Test Place', category: 'culture', distance: 1.0, score: 80 },
-        ],
+        destinations: [{ name: 'Test Place', category: 'culture', distance: 1.0, score: 80 }],
         limit: 5,
       };
 
@@ -333,9 +315,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 7,
         },
-        destinations: [
-          { name: 'Place 1', category: 'culture', distance: 1.234, score: 85.678 },
-        ],
+        destinations: [{ name: 'Place 1', category: 'culture', distance: 1.234, score: 85.678 }],
         limit: 5,
       };
 
@@ -352,9 +332,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 7,
         },
-        destinations: [
-          { name: 'Test Place', category: 'culture', distance: 1.0, score: 80 },
-        ],
+        destinations: [{ name: 'Test Place', category: 'culture', distance: 1.0, score: 80 }],
         limit: 5,
       };
 
@@ -370,9 +348,7 @@ describe('PromptTemplates', () => {
     it('should use Indonesian language in all prompts', () => {
       const itineraryPrompt = PromptTemplates.generateItineraryPrompt({
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'moderate',
@@ -391,9 +367,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 7,
         },
-        destinations: [
-          { name: 'Test', category: 'culture', distance: 1.0, score: 80 },
-        ],
+        destinations: [{ name: 'Test', category: 'culture', distance: 1.0, score: 80 }],
         limit: 5,
       });
 
@@ -405,9 +379,7 @@ describe('PromptTemplates', () => {
     it('should request structured JSON output in all prompts', () => {
       const itineraryPrompt = PromptTemplates.generateItineraryPrompt({
         userLocation: { latitude: -7.4728, longitude: 110.2122 },
-        destinations: [
-          { name: 'Test', category: 'culture', distance: 1.0 },
-        ],
+        destinations: [{ name: 'Test', category: 'culture', distance: 1.0 }],
         preferences: {
           interests: ['culture'],
           budgetLevel: 'moderate',
@@ -426,9 +398,7 @@ describe('PromptTemplates', () => {
           budgetLevel: 'moderate',
           mobilityLevel: 7,
         },
-        destinations: [
-          { name: 'Test', category: 'culture', distance: 1.0, score: 80 },
-        ],
+        destinations: [{ name: 'Test', category: 'culture', distance: 1.0, score: 80 }],
         limit: 5,
       });
 

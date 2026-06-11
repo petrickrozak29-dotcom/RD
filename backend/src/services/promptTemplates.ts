@@ -80,8 +80,8 @@ Gunakan Bahasa Indonesia yang ramah dan informatif.`;
       params.preferences.budgetLevel === 'budget'
         ? 'hemat (maksimal Rp 100,000 per hari)'
         : params.preferences.budgetLevel === 'moderate'
-        ? 'menengah (maksimal Rp 300,000 per hari)'
-        : 'premium (tidak terbatas)';
+          ? 'menengah (maksimal Rp 300,000 per hari)'
+          : 'premium (tidak terbatas)';
 
     const userPrompt = `Buatkan itinerary perjalanan dengan detail berikut:
 
@@ -115,9 +115,7 @@ Output dalam format JSON seperti yang diminta.`;
   /**
    * Generate destination insights prompt
    */
-  static generateDestinationInsightPrompt(
-    params: DestinationInsightParams
-  ): Array<{
+  static generateDestinationInsightPrompt(params: DestinationInsightParams): Array<{
     role: 'system' | 'user';
     content: string;
   }> {
@@ -210,8 +208,8 @@ Gunakan Bahasa Indonesia yang persuasif namun informatif.`;
       params.userPreferences.mobilityLevel <= 3
         ? 'terbatas (perlu aksesibilitas)'
         : params.userPreferences.mobilityLevel <= 7
-        ? 'menengah (dapat berjalan cukup jauh)'
-        : 'tinggi (dapat hiking/trekking)';
+          ? 'menengah (dapat berjalan cukup jauh)'
+          : 'tinggi (dapat hiking/trekking)';
 
     const userPrompt = `Berikan rekomendasi untuk pengguna dengan profil:
 

@@ -20,7 +20,7 @@ async function authenticateDeveloper(req: Request, res: Response, next: NextFunc
     const decoded = authService.verifyToken(token);
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, email: true, role: true, isActive: true }
+      select: { id: true, email: true, role: true, isActive: true },
     });
 
     if (!user || user.role !== 'ADMIN' || !user.isActive) {
@@ -48,10 +48,10 @@ router.get('/overview', async (_req, res) => {
         role: true,
         isActive: true,
         createdAt: true,
-        lastLogin: true
-      }
+        lastLogin: true,
+      },
     }),
-    submissionService.getSubmissions({ featureType: 'EVENT' })
+    submissionService.getSubmissions({ featureType: 'EVENT' }),
   ]);
 
   res.json({
@@ -59,9 +59,9 @@ router.get('/overview', async (_req, res) => {
       totalUser,
       totalEvent: events.length,
       eventPending: events.filter((event) => event.status === 'PENDING').length,
-      eventPublished: events.filter((event) => event.status === 'APPROVED').length
+      eventPublished: events.filter((event) => event.status === 'APPROVED').length,
     },
-    users
+    users,
   });
 });
 
@@ -77,8 +77,8 @@ router.get('/users', async (_req, res) => {
       isVerified: true,
       createdAt: true,
       updatedAt: true,
-      lastLogin: true
-    }
+      lastLogin: true,
+    },
   });
 
   res.json(users);
@@ -87,7 +87,7 @@ router.get('/users', async (_req, res) => {
 router.patch('/users/:id/toggle-active', async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
-    select: { id: true, email: true, isActive: true, role: true }
+    select: { id: true, email: true, isActive: true, role: true },
   });
 
   if (!user) {
@@ -95,7 +95,9 @@ router.patch('/users/:id/toggle-active', async (req, res) => {
   }
 
   if (user.role === 'ADMIN') {
-    return res.status(400).json({ error: 'Akun developer tidak bisa dinonaktifkan dari dashboard.' });
+    return res
+      .status(400)
+      .json({ error: 'Akun developer tidak bisa dinonaktifkan dari dashboard.' });
   }
 
   const updated = await prisma.user.update({
@@ -108,8 +110,8 @@ router.patch('/users/:id/toggle-active', async (req, res) => {
       role: true,
       isActive: true,
       createdAt: true,
-      lastLogin: true
-    }
+      lastLogin: true,
+    },
   });
 
   res.json(updated);
@@ -117,11 +119,16 @@ router.patch('/users/:id/toggle-active', async (req, res) => {
 
 function getFeatureType(type: ContentType) {
   switch (type) {
-    case 'tourism': return 'WISATA';
-    case 'culinary': return 'KULINER';
-    case 'culture': return 'CULTURE';
-    case 'history': return 'HISTORY';
-    default: return 'WISATA';
+    case 'tourism':
+      return 'WISATA';
+    case 'culinary':
+      return 'KULINER';
+    case 'culture':
+      return 'CULTURE';
+    case 'history':
+      return 'HISTORY';
+    default:
+      return 'WISATA';
   }
 }
 
@@ -129,9 +136,11 @@ router.get('/content/:type', async (req, res) => {
   try {
     const type = req.params.type as ContentType;
     const featureType = getFeatureType(type);
-    
+
     const records = await submissionService.getSubmissions({ featureType });
-    res.json(records.map(r => ({ ...r, status: r.status.toLowerCase(), typeLabel: r.category?.name })));
+    res.json(
+      records.map((r) => ({ ...r, status: r.status.toLowerCase(), typeLabel: r.category?.name }))
+    );
   } catch (err) {
     res.status(500).json({ error: 'Gagal mengambil konten' });
   }
@@ -150,7 +159,7 @@ router.get('/submissions', async (req, res) => {
       where.OR = [
         { title: { contains: qStr } },
         { description: { contains: qStr } },
-        { category: { name: { contains: qStr } } }
+        { category: { name: { contains: qStr } } },
       ];
     }
 
@@ -158,12 +167,18 @@ router.get('/submissions', async (req, res) => {
       where,
       include: {
         category: true,
-        submittedBy: { select: { id: true, name: true, email: true } }
+        submittedBy: { select: { id: true, name: true, email: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
-    res.json(submissions.map(s => ({ ...s, status: s.status.toLowerCase(), typeLabel: s.category?.name })));
+    res.json(
+      submissions.map((s) => ({
+        ...s,
+        status: s.status.toLowerCase(),
+        typeLabel: s.category?.name,
+      }))
+    );
   } catch (err) {
     res.status(500).json({ error: 'Gagal mengambil submissions' });
   }
@@ -174,7 +189,7 @@ router.post('/content/:type', async (req, res) => {
     const type = req.params.type as ContentType;
     const featureType = getFeatureType(type);
     const payload = req.body || {};
-    
+
     const title = payload.title || payload.name;
     if (!title || (!payload.description && !payload.content)) {
       return res.status(400).json({ error: 'Nama/judul dan deskripsi/konten harus diisi.' });
@@ -191,9 +206,9 @@ router.post('/content/:type', async (req, res) => {
       image: payload.image,
       link: payload.link,
       priceRange: payload.priceRange,
-      date: payload.date ? new Date(payload.date) : undefined
+      date: payload.date ? new Date(payload.date) : undefined,
     });
-    
+
     // Automatically approve developer-created content
     await submissionService.updateStatus(item.id, 'APPROVED');
 
@@ -209,7 +224,7 @@ router.put('/content/:type/:id', async (req, res) => {
     // For now we assume we just update it using prisma directly
     const id = req.params.id;
     const payload = req.body;
-    
+
     const updated = await prisma.submission.update({
       where: { id },
       data: {
@@ -220,8 +235,8 @@ router.put('/content/:type/:id', async (req, res) => {
         longitude: payload.longitude,
         image: payload.image,
         link: payload.link,
-        priceRange: payload.priceRange
-      }
+        priceRange: payload.priceRange,
+      },
     });
 
     res.json({ ...updated, status: updated.status.toLowerCase() });
@@ -286,7 +301,7 @@ router.post('/smart-magelang', async (req, res) => {
       description: payload.description,
       categoryName: payload.categoryName || 'Umum',
       sourceUrl: payload.sourceUrl,
-      image: payload.image
+      image: payload.image,
     });
 
     res.status(201).json(created);

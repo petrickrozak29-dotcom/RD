@@ -1,4 +1,9 @@
-import { OpenAIClient, OpenAIClientError, initializeOpenAIClient, getOpenAIClient } from './openaiClient';
+import {
+  OpenAIClient,
+  OpenAIClientError,
+  initializeOpenAIClient,
+  getOpenAIClient,
+} from './openaiClient';
 
 // Mock cacheService
 jest.mock('./cacheService', () => ({
@@ -93,10 +98,9 @@ describe('OpenAIClient', () => {
       const cachedResult = 'Cached response';
       mockGet.mockResolvedValue(cachedResult);
 
-      const result = await client.generateChatCompletion(
-        [{ role: 'user', content: 'test' }],
-        { cacheKey: 'test-cache-key' }
-      );
+      const result = await client.generateChatCompletion([{ role: 'user', content: 'test' }], {
+        cacheKey: 'test-cache-key',
+      });
 
       expect(result).toBe(cachedResult);
       expect(mockGet).toHaveBeenCalledWith('test-cache-key');
@@ -109,10 +113,9 @@ describe('OpenAIClient', () => {
         choices: [{ message: { content: 'AI response' } }],
       });
 
-      const result = await client.generateChatCompletion(
-        [{ role: 'user', content: 'test' }],
-        { cacheKey: 'test-cache-key' }
-      );
+      const result = await client.generateChatCompletion([{ role: 'user', content: 'test' }], {
+        cacheKey: 'test-cache-key',
+      });
 
       expect(result).toBe('AI response');
       expect(mockGet).toHaveBeenCalledWith('test-cache-key');
@@ -221,9 +224,7 @@ describe('OpenAIClient', () => {
           choices: [{ message: { content: 'Success after retries' } }],
         });
 
-      const result = await client.generateChatCompletion([
-        { role: 'user', content: 'test' },
-      ]);
+      const result = await client.generateChatCompletion([{ role: 'user', content: 'test' }]);
 
       expect(result).toBe('Success after retries');
       expect(mockCreate).toHaveBeenCalledTimes(3);
@@ -362,10 +363,10 @@ describe('OpenAIClient', () => {
         choices: [{ message: { content: 'AI response' } }],
       });
 
-      await client.generateChatCompletion(
-        [{ role: 'user', content: 'test' }],
-        { cacheKey: 'test-key', cacheTTL: 3600 }
-      );
+      await client.generateChatCompletion([{ role: 'user', content: 'test' }], {
+        cacheKey: 'test-key',
+        cacheTTL: 3600,
+      });
 
       expect(mockSet).toHaveBeenCalledWith('test-key', 'AI response', 3600);
     });

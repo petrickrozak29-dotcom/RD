@@ -26,7 +26,7 @@ const loginLimiter = rateLimit({
   max: 5,
   message: 'Too many login attempts, please try again after 15 minutes',
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });
 
 // POST /api/auth/register
@@ -36,7 +36,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     if (!email || !password || !name) {
       return res.status(400).json({
-        error: 'Email, password, and name are required'
+        error: 'Email, password, and name are required',
       });
     }
 
@@ -58,7 +58,7 @@ router.post('/login', loginLimiter, async (req: Request, res: Response) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        error: 'Email and password are required'
+        error: 'Email and password are required',
       });
     }
 
@@ -77,7 +77,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
 
     if (!refreshToken) {
       return res.status(400).json({
-        error: 'Refresh token is required'
+        error: 'Refresh token is required',
       });
     }
 

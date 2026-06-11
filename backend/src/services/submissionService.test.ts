@@ -39,22 +39,22 @@ describe('Submission Service', () => {
         description: 'Wisata alam indah',
         featureType: 'WISATA',
         categoryName: 'Alam',
-        location: 'Magelang'
+        location: 'Magelang',
       });
 
       expect(prisma.category.findFirst).toHaveBeenCalledWith({
-        where: { name: 'Alam', featureType: 'WISATA' }
+        where: { name: 'Alam', featureType: 'WISATA' },
       });
       expect(prisma.category.create).toHaveBeenCalledWith({
-        data: { name: 'Alam', featureType: 'WISATA' }
+        data: { name: 'Alam', featureType: 'WISATA' },
       });
       expect(prisma.submission.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           title: 'Bukit Rhema',
           featureType: 'WISATA',
           status: 'PENDING',
-          categoryId: 'cat-1'
-        })
+          categoryId: 'cat-1',
+        }),
       });
       expect(result).toEqual(mockSubmission);
     });
@@ -70,15 +70,15 @@ describe('Submission Service', () => {
         title: 'Kupat Tahu',
         description: 'Enak',
         featureType: 'KULINER',
-        categoryName: 'Makanan Khas'
+        categoryName: 'Makanan Khas',
       });
 
       expect(prisma.category.findFirst).toHaveBeenCalled();
       expect(prisma.category.create).not.toHaveBeenCalled();
       expect(prisma.submission.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          categoryId: 'cat-2'
-        })
+          categoryId: 'cat-2',
+        }),
       });
       expect(result).toEqual(mockSubmission);
     });
@@ -94,7 +94,7 @@ describe('Submission Service', () => {
       expect(prisma.submission.findMany).toHaveBeenCalledWith({
         where: { status: 'PENDING' },
         include: expect.any(Object),
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
       expect(result).toEqual(mockList);
     });
@@ -109,7 +109,7 @@ describe('Submission Service', () => {
 
       expect(prisma.submission.update).toHaveBeenCalledWith({
         where: { id: 'sub-1' },
-        data: { status: 'APPROVED' }
+        data: { status: 'APPROVED' },
       });
       expect(result).toEqual(mockUpdated);
     });
@@ -122,7 +122,7 @@ describe('Submission Service', () => {
       await submissionService.deleteSubmission('sub-1');
 
       expect(prisma.submission.delete).toHaveBeenCalledWith({
-        where: { id: 'sub-1' }
+        where: { id: 'sub-1' },
       });
     });
   });

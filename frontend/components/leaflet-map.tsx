@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useRef } from 'react';
 
@@ -28,7 +28,7 @@ const markerColor: Record<string, string> = {
   event: '#f43f5e',
   wisata: '#06b6d4',
   kuliner: '#f59e0b',
-  lokasi: '#22c55e'
+  lokasi: '#22c55e',
 };
 
 function escapeHtml(value?: string | number) {
@@ -47,7 +47,9 @@ function getPopupHtml(marker: MarkerItem) {
   const description = escapeHtml(marker.description);
   const distance = typeof marker.distance === 'number' ? `${marker.distance.toFixed(1)} km` : '';
   const detailUrl = marker.detailUrl || `/smart-map?focus=${encodeURIComponent(String(marker.id))}`;
-  const openUrl = marker.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(marker.location || marker.title)}`;
+  const openUrl =
+    marker.link ||
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(marker.location || marker.title)}`;
   const image = marker.image
     ? `<img src="${escapeHtml(marker.image)}" alt="${title}" style="width:100%;height:96px;object-fit:cover;border-radius:8px;margin-bottom:10px;" />`
     : '';
@@ -88,11 +90,11 @@ export default function LeafletMap({ markers, center, focusId }: LeafletMapProps
       mapInstance.current = L.map(mapRef.current, {
         center: center ? [center.lat, center.lng] : [-7.4797, 110.2177],
         zoom: 12,
-        scrollWheelZoom: true
+        scrollWheelZoom: true,
       });
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors',
       }).addTo(mapInstance.current);
 
       markerLayer.current = L.layerGroup().addTo(mapInstance.current);
@@ -127,7 +129,7 @@ export default function LeafletMap({ markers, center, focusId }: LeafletMapProps
         html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 8px 18px rgba(15,23,42,.35);"></span>`,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
-        popupAnchor: [0, -8]
+        popupAnchor: [0, -8],
       });
 
       const leafletMarker = leafletRef.current

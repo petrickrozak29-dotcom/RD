@@ -27,7 +27,12 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
       WISATA: ['Alam', 'Sejarah', 'Taman Rekreasi', 'Spot Populer'],
       KULINER: ['Makanan Khas', 'Pusat Kuliner', 'UMKM', 'Kopi dan Kafe'],
       EVENT: ['Konser Musik', 'Seni & Budaya', 'Pameran', 'Agenda Lokal'],
-      SMART_MAGELANG: ['Infrastruktur Teknologi', 'Internet dan Jaringan Komunikasi', 'Digitalisasi Layanan Publik', 'Pengembangan Smart City']
+      SMART_MAGELANG: [
+        'Infrastruktur Teknologi',
+        'Internet dan Jaringan Komunikasi',
+        'Digitalisasi Layanan Publik',
+        'Pengembangan Smart City',
+      ],
     };
 
     for (const [featureType, list] of Object.entries(defaultCategories)) {
@@ -35,7 +40,7 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
         await prisma.category.upsert({
           where: { name_featureType: { name, featureType } },
           update: {},
-          create: { name, featureType }
+          create: { name, featureType },
         });
       }
     }
@@ -67,8 +72,8 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
           longitude: 110.2038,
           image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Borobudur_Temple.jpg',
           createdAt: now,
-          updatedAt: now
-        }
+          updatedAt: now,
+        },
       });
     }
 
@@ -86,11 +91,12 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
           status: 'APPROVED',
           categoryId: kulinerCatId,
           location: 'Pusat Kota Magelang',
-          image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80',
+          image:
+            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80',
           priceRange: 'Rp 10.000 - Rp 25.000',
           createdAt: now,
-          updatedAt: now
-        }
+          updatedAt: now,
+        },
       });
     }
 
@@ -109,10 +115,11 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
           categoryId: eventCatId,
           location: 'Alun-alun Magelang',
           date: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
-          image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
+          image:
+            'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
           createdAt: now,
-          updatedAt: now
-        }
+          updatedAt: now,
+        },
       });
     }
 
@@ -121,69 +128,81 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
       {
         id: 'seed-event-bestieval-2026',
         title: 'BESTIEVAL Magelang 2026',
-        description: 'Konser musik lintas genre di area Artos Magelang dengan konsep festival hiburan anak muda.',
+        description:
+          'Konser musik lintas genre di area Artos Magelang dengan konsep festival hiburan anak muda.',
         categoryName: 'Konser Musik',
         location: 'Lap. AIM Artos Magelang',
         date: new Date(now.getTime()),
         latitude: -7.4912,
         longitude: 110.2265,
-        image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80'
+        image:
+          'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
       },
       {
         id: 'seed-event-borobudur-playon-2026',
         title: 'Rupiah Borobudur PlayOn 2026',
-        description: 'Event lari 10K dan 5K di kawasan Borobudur yang menggabungkan olahraga, suasana desa, dan panorama candi.',
+        description:
+          'Event lari 10K dan 5K di kawasan Borobudur yang menggabungkan olahraga, suasana desa, dan panorama candi.',
         categoryName: 'Agenda Lokal',
         location: 'Candi Borobudur, Magelang',
         date: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 20),
         latitude: -7.6079,
         longitude: 110.2038,
-        image: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80'
+        image:
+          'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80',
       },
       {
         id: 'seed-event-bite-2026',
         title: 'Borobudur International Tourism Expo & Forum 2026',
-        description: 'Forum dan expo B2B pariwisata, hospitality, travel agent, dan MICE di Magelang.',
+        description:
+          'Forum dan expo B2B pariwisata, hospitality, travel agent, dan MICE di Magelang.',
         categoryName: 'Pameran',
         location: 'Grand Artos Hotel & Convention',
         date: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30),
         latitude: -7.4912,
         longitude: 110.2265,
-        image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80'
+        image:
+          'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
       },
       {
         id: 'seed-event-taruna-run-2026',
         title: 'Sucorwave Taruna Nusantara Run 2026',
-        description: 'Ajang lari bertema Pace of Generations yang digelar di kawasan SMA Taruna Nusantara Magelang.',
+        description:
+          'Ajang lari bertema Pace of Generations yang digelar di kawasan SMA Taruna Nusantara Magelang.',
         categoryName: 'Agenda Lokal',
         location: 'SMA Taruna Nusantara, Banyurojo',
         date: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 40),
         latitude: -7.5013,
         longitude: 110.1835,
-        image: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80'
+        image:
+          'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80',
       },
       {
         id: 'seed-event-ketep-summit-2026',
         title: 'Ketep Summit Festival',
-        description: 'Festival di kawasan Ketep Pass dengan agenda lari lintas alam, seni tradisional, produk lokal, dan edukasi gunung api.',
+        description:
+          'Festival di kawasan Ketep Pass dengan agenda lari lintas alam, seni tradisional, produk lokal, dan edukasi gunung api.',
         categoryName: 'Seni & Budaya',
         location: 'Ketep Pass, Sawangan',
         date: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 50),
         latitude: -7.4943,
         longitude: 110.3811,
-        image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80'
+        image:
+          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80',
       },
       {
         id: 'seed-event-borobudur-marathon-2026',
         title: 'Borobudur Marathon 2026',
-        description: 'Event lari besar di sekitar Borobudur dengan rute yang memadukan olahraga, wisata, dan budaya.',
+        description:
+          'Event lari besar di sekitar Borobudur dengan rute yang memadukan olahraga, wisata, dan budaya.',
         categoryName: 'Agenda Lokal',
         location: 'Taman Wisata Candi Borobudur',
         date: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 150),
         latitude: -7.6079,
         longitude: 110.2038,
-        image: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80'
-      }
+        image:
+          'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80',
+      },
     ];
 
     for (const ev of systemSeedEvents) {
@@ -206,27 +225,29 @@ router.post('/run', authenticateAdmin, async (_req: Request, res: Response) => {
           longitude: ev.longitude,
           image: ev.image,
           createdAt: now,
-          updatedAt: now
-        }
+          updatedAt: now,
+        },
       });
     }
 
     // Create a couple of SmartMagelang contents
     const smartCategories = ['Infrastruktur Teknologi', 'Digitalisasi Layanan Publik'];
     for (const name of smartCategories) {
-      const cat = await prisma.category.findFirst({ where: { name, featureType: 'SMART_MAGELANG' } });
+      const cat = await prisma.category.findFirst({
+        where: { name, featureType: 'SMART_MAGELANG' },
+      });
       if (cat) {
         await prisma.smartMagelangContent.upsert({
           where: { id: `seed-smart-${slugify(name)}` },
           update: {},
           create: {
             id: `seed-smart-${slugify(name)}`,
-            title: `${name} (Seed)` ,
+            title: `${name} (Seed)`,
             description: `Contoh konten Smart Magelang untuk kategori ${name}`,
             categoryId: cat.id,
             sourceUrl: 'https://magelangkota.go.id/',
-            image: ''
-          }
+            image: '',
+          },
         });
       }
     }

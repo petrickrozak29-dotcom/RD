@@ -19,16 +19,16 @@ router.post('/itinerary', async (req, res) => {
       latitude: typeof latitude === 'number' ? latitude : undefined,
       longitude: typeof longitude === 'number' ? longitude : undefined,
       startTime: new Date(),
-      interests: ['wisata', 'kuliner'] // Default fallback
+      interests: ['wisata', 'kuliner'], // Default fallback
     });
 
     // Remap to match old mock format if needed, or return raw
     res.json({
-      itinerary: result.itinerary.map(item => ({
+      itinerary: result.itinerary.map((item) => ({
         time: item.startTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-        activity: `Kunjungi ${item.destination.name}`
+        activity: `Kunjungi ${item.destination.name}`,
       })),
-      note: result.summary
+      note: result.summary,
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

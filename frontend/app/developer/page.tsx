@@ -1,7 +1,19 @@
-"use client";
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, CheckCircle2, Eye, ImagePlus, MapPin, Pencil, Plus, Save, Trash2, Users, XCircle } from 'lucide-react';
+import {
+  BarChart3,
+  CheckCircle2,
+  Eye,
+  ImagePlus,
+  MapPin,
+  Pencil,
+  Plus,
+  Save,
+  Trash2,
+  Users,
+  XCircle,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
@@ -36,10 +48,17 @@ import {
   type DeveloperContentItem,
   type DeveloperContentType,
   type EventStatus,
-  type SmartMapItem
+  type SmartMapItem,
 } from '../../lib/magelang-data';
 
-type SectionKey = 'overview' | 'smartMap' | 'smartCity' | 'categories' | DeveloperContentType | 'events' | 'users';
+type SectionKey =
+  | 'overview'
+  | 'smartMap'
+  | 'smartCity'
+  | 'categories'
+  | DeveloperContentType
+  | 'events'
+  | 'users';
 
 interface DeveloperUser {
   id: string;
@@ -71,17 +90,18 @@ const sections: Array<{ key: SectionKey; label: string }> = [
   { key: 'culture', label: 'Kelola Budaya' },
   { key: 'history', label: 'Kelola Sejarah' },
   { key: 'events', label: 'Kelola Event' },
-  { key: 'users', label: 'Kelola Pengguna' }
+  { key: 'users', label: 'Kelola Pengguna' },
 ];
 
 const defaultCulture: DeveloperContentItem[] = [
   {
     id: 'culture-mantyasih',
     title: 'Cagar Budaya Mantyasih',
-    description: 'Jejak Mantyasih menjadi pintu masuk penting untuk memahami hari jadi Kota Magelang.',
+    description:
+      'Jejak Mantyasih menjadi pintu masuk penting untuk memahami hari jadi Kota Magelang.',
     category: 'Budaya',
     details: ['Lumpang Mantyasih', 'Prasasti lokal', 'Kampung Meteseh'],
-    source: 'https://kebudayaan.magelangkota.go.id/'
+    source: 'https://kebudayaan.magelangkota.go.id/',
   },
   {
     id: 'culture-festival',
@@ -89,8 +109,8 @@ const defaultCulture: DeveloperContentItem[] = [
     description: 'Agenda seni, batik, aksara, museum, dan kegiatan edukasi budaya Magelang.',
     category: 'Budaya',
     details: ['Parade seni', 'Harmoni batik', 'Pameran aksara'],
-    source: 'https://kebudayaan.magelangkota.go.id/'
-  }
+    source: 'https://kebudayaan.magelangkota.go.id/',
+  },
 ];
 
 const defaultHistory: DeveloperContentItem[] = [
@@ -99,19 +119,22 @@ const defaultHistory: DeveloperContentItem[] = [
     title: 'Mantyasih dan Hari Jadi',
     period: 'Mantyasih dan Hari Jadi',
     year: '907 M',
-    description: 'Cikal bakal Magelang dikaitkan dengan Desa Perdikan Mantyasih dan tradisi sejarah 11 April 907.',
+    description:
+      'Cikal bakal Magelang dikaitkan dengan Desa Perdikan Mantyasih dan tradisi sejarah 11 April 907.',
     image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Borobudur_Temple.jpg',
-    source: 'https://magelangkota.go.id/page/profil-kota-magelang-2'
+    source: 'https://magelangkota.go.id/page/profil-kota-magelang-2',
   },
   {
     id: 'history-modern',
     title: 'Heritage, Wisata, dan Kota Modern',
     period: 'Heritage, Wisata, dan Kota Modern',
     year: '2000-sekarang',
-    description: 'Identitas Magelang bergerak di antara heritage, pariwisata, UMKM, pendidikan, dan layanan digital.',
-    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
-    source: 'https://magesty.magelangkota.go.id/'
-  }
+    description:
+      'Identitas Magelang bergerak di antara heritage, pariwisata, UMKM, pendidikan, dan layanan digital.',
+    image:
+      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
+    source: 'https://magesty.magelangkota.go.id/',
+  },
 ];
 
 const emptyForm: DeveloperContentItem = {
@@ -131,7 +154,7 @@ const emptyForm: DeveloperContentItem = {
   details: [],
   year: '',
   period: '',
-  source: ''
+  source: '',
 };
 
 function fromMapItem(item: SmartMapItem): DeveloperContentItem {
@@ -148,7 +171,7 @@ function fromMapItem(item: SmartMapItem): DeveloperContentItem {
     rating: item.rating,
     priceRange: item.priceRange,
     openingHours: item.openingHours,
-    details: item.tags || []
+    details: item.tags || [],
   };
 }
 
@@ -171,7 +194,7 @@ export default function DeveloperPage() {
     tourism: [],
     culinary: [],
     culture: [],
-    history: []
+    history: [],
   });
   const [formType, setFormType] = useState<DeveloperContentType>('tourism');
   const [form, setForm] = useState<DeveloperContentItem>(emptyForm);
@@ -210,7 +233,7 @@ export default function DeveloperPage() {
       tourism: getDeveloperContent('tourism'),
       culinary: getDeveloperContent('culinary'),
       culture: getDeveloperContent('culture'),
-      history: getDeveloperContent('history')
+      history: getDeveloperContent('history'),
     });
     setCulinarySubmissions(getStoredCommunityCulinary());
     setTourismSubmissions(getStoredCommunityTourism());
@@ -230,7 +253,7 @@ export default function DeveloperPage() {
 
     try {
       const payload = await apiJson<OverviewPayload>('/api/developer/overview', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setOverview(payload);
       setUsers(payload.users);
@@ -246,11 +269,23 @@ export default function DeveloperPage() {
 
       // Try to fetch managed items count from API to populate counts
       try {
-        const [tourismApi, culinaryApi] = await Promise.all([fetchTourismItems(false), fetchCulinaryItems(false)]);
-        setContent((c) => ({ ...c, tourism: c.tourism.concat(tourismApi.map((i) => ({ id: i.id, title: i.title, description: i.description } as any))) }));
+        const [tourismApi, culinaryApi] = await Promise.all([
+          fetchTourismItems(false),
+          fetchCulinaryItems(false),
+        ]);
+        setContent((c) => ({
+          ...c,
+          tourism: c.tourism.concat(
+            tourismApi.map((i) => ({ id: i.id, title: i.title, description: i.description }) as any)
+          ),
+        }));
         // store temporary culinary/tourism submissions counts
-        setCulinarySubmissions((s) => s.concat(culinaryApi.map((i) => ({ id: i.id, title: i.title, status: i.status } as any))));
-        setTourismSubmissions((s) => s.concat(tourismApi.map((i) => ({ id: i.id, title: i.title, status: i.status } as any))));
+        setCulinarySubmissions((s) =>
+          s.concat(culinaryApi.map((i) => ({ id: i.id, title: i.title, status: i.status }) as any))
+        );
+        setTourismSubmissions((s) =>
+          s.concat(tourismApi.map((i) => ({ id: i.id, title: i.title, status: i.status }) as any))
+        );
       } catch {
         // ignore API failures; local state remains
       }
@@ -283,31 +318,43 @@ export default function DeveloperPage() {
     };
   }, []);
 
-  const computedStats = useMemo(() => ({
-    totalUser: overview?.stats.totalUser ?? users.length,
-    totalEvent: events.length,
-    eventPending: events.filter((event) => event.status === 'pending').length,
-    eventPublished: events.filter((event) => event.status === 'approved').length,
-    culinaryPending: culinarySubmissions.filter((item) => item.status === 'pending').length
-  }), [culinarySubmissions, events, overview, users.length]);
+  const computedStats = useMemo(
+    () => ({
+      totalUser: overview?.stats.totalUser ?? users.length,
+      totalEvent: events.length,
+      eventPending: events.filter((event) => event.status === 'pending').length,
+      eventPublished: events.filter((event) => event.status === 'approved').length,
+      culinaryPending: culinarySubmissions.filter((item) => item.status === 'pending').length,
+    }),
+    [culinarySubmissions, events, overview, users.length]
+  );
 
-  const eventGroups = useMemo(() => ({
-    pending: events.filter((event) => event.status === 'pending'),
-    approved: events.filter((event) => event.status === 'approved'),
-    rejected: events.filter((event) => event.status === 'rejected')
-  }), [events]);
+  const eventGroups = useMemo(
+    () => ({
+      pending: events.filter((event) => event.status === 'pending'),
+      approved: events.filter((event) => event.status === 'approved'),
+      rejected: events.filter((event) => event.status === 'rejected'),
+    }),
+    [events]
+  );
 
-  const culinaryGroups = useMemo(() => ({
-    pending: culinarySubmissions.filter((item) => item.status === 'pending'),
-    approved: culinarySubmissions.filter((item) => item.status === 'approved'),
-    rejected: culinarySubmissions.filter((item) => item.status === 'rejected')
-  }), [culinarySubmissions]);
+  const culinaryGroups = useMemo(
+    () => ({
+      pending: culinarySubmissions.filter((item) => item.status === 'pending'),
+      approved: culinarySubmissions.filter((item) => item.status === 'approved'),
+      rejected: culinarySubmissions.filter((item) => item.status === 'rejected'),
+    }),
+    [culinarySubmissions]
+  );
 
-  const tourismGroups = useMemo(() => ({
-    pending: tourismSubmissions.filter((item) => item.status === 'pending'),
-    approved: tourismSubmissions.filter((item) => item.status === 'approved'),
-    rejected: tourismSubmissions.filter((item) => item.status === 'rejected')
-  }), [tourismSubmissions]);
+  const tourismGroups = useMemo(
+    () => ({
+      pending: tourismSubmissions.filter((item) => item.status === 'pending'),
+      approved: tourismSubmissions.filter((item) => item.status === 'approved'),
+      rejected: tourismSubmissions.filter((item) => item.status === 'rejected'),
+    }),
+    [tourismSubmissions]
+  );
 
   const handleEdit = (type: DeveloperContentType, item: DeveloperContentItem) => {
     setFormType(type);
@@ -326,12 +373,18 @@ export default function DeveloperPage() {
       ...form,
       title: form.title.trim(),
       description: form.description.trim(),
-      details: typeof form.details === 'string'
-        ? String(form.details).split(',').map((item) => item.trim()).filter(Boolean)
-        : form.details
+      details:
+        typeof form.details === 'string'
+          ? String(form.details)
+              .split(',')
+              .map((item) => item.trim())
+              .filter(Boolean)
+          : form.details,
     });
 
-    setStatus(`${normalized.title} tersimpan di ${sections.find((item) => item.key === formType)?.label}.`);
+    setStatus(
+      `${normalized.title} tersimpan di ${sections.find((item) => item.key === formType)?.label}.`
+    );
     resetForm(formType);
 
     if (token) {
@@ -340,19 +393,23 @@ export default function DeveloperPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(normalized)
+          body: JSON.stringify(normalized),
         });
       } catch {
-        setStatus(`${normalized.title} tersimpan lokal. Backend developer belum menerima sinkronisasi.`);
+        setStatus(
+          `${normalized.title} tersimpan lokal. Backend developer belum menerima sinkronisasi.`
+        );
       }
     }
   };
 
   const handleDeleteContent = (type: DeveloperContentType, item: DeveloperContentItem) => {
     deleteDeveloperContent(type, item.id);
-    setStatus(`${item.title} dihapus dari ${sections.find((section) => section.key === type)?.label}.`);
+    setStatus(
+      `${item.title} dihapus dari ${sections.find((section) => section.key === type)?.label}.`
+    );
   };
 
   const moderateEvent = async (item: CommunityEvent, nextStatus: EventStatus) => {
@@ -364,41 +421,46 @@ export default function DeveloperPage() {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ status: nextStatus })
+          body: JSON.stringify({ status: nextStatus }),
         });
       } catch {
         setStatus('Status event tersimpan lokal. Sinkron backend belum berhasil.');
       }
     }
 
-    setEvents((current) => current.map((event) => event.id === item.id ? { ...event, status: nextStatus } : event));
-    setStatus(nextStatus === 'approved'
-      ? 'Event published dan masuk Event serta Smart Map.'
-      : `Event dipindahkan ke ${statusLabel(nextStatus)}.`
+    setEvents((current) =>
+      current.map((event) => (event.id === item.id ? { ...event, status: nextStatus } : event))
+    );
+    setStatus(
+      nextStatus === 'approved'
+        ? 'Event published dan masuk Event serta Smart Map.'
+        : `Event dipindahkan ke ${statusLabel(nextStatus)}.`
     );
   };
 
   const moderateCulinary = (item: CommunityCulinary, nextStatus: EventStatus) => {
     updateCommunityCulinaryStatus(item.id, nextStatus);
-    setCulinarySubmissions((current) => current.map((record) => (
-      record.id === item.id ? { ...record, status: nextStatus } : record
-    )));
-    setStatus(nextStatus === 'approved'
-      ? 'Kuliner/UMKM published dan masuk Kuliner serta Smart Map.'
-      : `Kuliner/UMKM dipindahkan ke ${statusLabel(nextStatus)}.`
+    setCulinarySubmissions((current) =>
+      current.map((record) => (record.id === item.id ? { ...record, status: nextStatus } : record))
+    );
+    setStatus(
+      nextStatus === 'approved'
+        ? 'Kuliner/UMKM published dan masuk Kuliner serta Smart Map.'
+        : `Kuliner/UMKM dipindahkan ke ${statusLabel(nextStatus)}.`
     );
   };
 
   const moderateTourism = (item: CommunityTourism, nextStatus: EventStatus) => {
     updateCommunityTourismStatus(item.id, nextStatus);
-    setTourismSubmissions((current) => current.map((record) => (
-      record.id === item.id ? { ...record, status: nextStatus } : record
-    )));
-    setStatus(nextStatus === 'approved'
-      ? 'Spot Populer published dan masuk Wisata serta Smart Map.'
-      : `Spot Populer dipindahkan ke ${statusLabel(nextStatus)}.`
+    setTourismSubmissions((current) =>
+      current.map((record) => (record.id === item.id ? { ...record, status: nextStatus } : record))
+    );
+    setStatus(
+      nextStatus === 'approved'
+        ? 'Spot Populer published dan masuk Wisata serta Smart Map.'
+        : `Spot Populer dipindahkan ke ${statusLabel(nextStatus)}.`
     );
   };
 
@@ -406,12 +468,17 @@ export default function DeveloperPage() {
     if (!token) return;
 
     try {
-      const updated = await apiJson<DeveloperUser>(`/api/developer/users/${item.id}/toggle-active`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const updated = await apiJson<DeveloperUser>(
+        `/api/developer/users/${item.id}/toggle-active`,
+        {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      setUsers((current) => current.map((userItem) => userItem.id === updated.id ? updated : userItem));
+      setUsers((current) =>
+        current.map((userItem) => (userItem.id === updated.id ? updated : userItem))
+      );
       setStatus(`${updated.name} sekarang ${updated.isActive ? 'aktif' : 'nonaktif'}.`);
     } catch (error: any) {
       setStatus(error.message || 'Gagal mengubah status pengguna.');
@@ -489,15 +556,13 @@ export default function DeveloperPage() {
               />
             )}
 
-            {active === 'smartCity' && (
-              <SmartMagelangManager token={token} />
-            )}
+            {active === 'smartCity' && <SmartMagelangManager token={token} />}
 
-            {active === 'categories' && (
-              <CategoryManager token={token} />
-            )}
+            {active === 'categories' && <CategoryManager token={token} />}
 
-            {(['tourism', 'culinary', 'culture', 'history'] as DeveloperContentType[]).includes(active as DeveloperContentType) && (
+            {(['tourism', 'culinary', 'culture', 'history'] as DeveloperContentType[]).includes(
+              active as DeveloperContentType
+            ) && (
               <div className="space-y-6">
                 <ContentManager
                   type={active as DeveloperContentType}
@@ -514,11 +579,17 @@ export default function DeveloperPage() {
                 />
 
                 {active === 'culinary' && (
-                  <CulinarySubmissionManager itemGroups={culinaryGroups} onModerate={moderateCulinary} />
+                  <CulinarySubmissionManager
+                    itemGroups={culinaryGroups}
+                    onModerate={moderateCulinary}
+                  />
                 )}
 
                 {active === 'tourism' && (
-                  <TourismSubmissionManager itemGroups={tourismGroups} onModerate={moderateTourism} />
+                  <TourismSubmissionManager
+                    itemGroups={tourismGroups}
+                    onModerate={moderateTourism}
+                  />
                 )}
               </div>
             )}
@@ -556,7 +627,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
 function SmartMapManager({
   tourismCount,
   culinaryCount,
-  eventCount
+  eventCount,
 }: {
   tourismCount: number;
   culinaryCount: number;
@@ -570,7 +641,8 @@ function SmartMapManager({
           Kelola Smart Map
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
-          Marker Smart Map berasal dari event published, wisata, kuliner, dan UMKM yang sudah disetujui. Gunakan pintasan berikut untuk mengelola sumber datanya.
+          Marker Smart Map berasal dari event published, wisata, kuliner, dan UMKM yang sudah
+          disetujui. Gunakan pintasan berikut untuk mengelola sumber datanya.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <StatCard label="Marker Wisata" value={tourismCount} />
@@ -578,8 +650,18 @@ function SmartMapManager({
           <StatCard label="Marker Event" value={eventCount} />
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
-          <a href="/smart-map" className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300">Buka Smart Map</a>
-          <a href="/developer" className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-cyan-200 hover:border-cyan-300">Dashboard</a>
+          <a
+            href="/smart-map"
+            className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300"
+          >
+            Buka Smart Map
+          </a>
+          <a
+            href="/developer"
+            className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-cyan-200 hover:border-cyan-300"
+          >
+            Dashboard
+          </a>
         </div>
       </div>
     </section>
@@ -590,13 +672,20 @@ function SmartMagelangManager({ token }: { token?: string | null }) {
   const [items, setItems] = useState<any[]>([]);
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ id: '', title: '', description: '', categoryName: '', sourceUrl: '', image: '' });
+  const [form, setForm] = useState({
+    id: '',
+    title: '',
+    description: '',
+    categoryName: '',
+    sourceUrl: '',
+    image: '',
+  });
 
   const fetchItems = async () => {
     setLoading(true);
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/developer/smart-magelang`, {
-        headers: { Authorization: token ? `Bearer ${token}` : '' }
+        headers: { Authorization: token ? `Bearer ${token}` : '' },
       });
       if (!res.ok) throw new Error('Gagal fetch');
       const data = await res.json();
@@ -608,29 +697,51 @@ function SmartMagelangManager({ token }: { token?: string | null }) {
     }
   };
 
-  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
-  const handleEdit = (item: any) => setForm({ id: item.id, title: item.title, description: item.description, categoryName: item.category?.name || '', sourceUrl: item.sourceUrl || '', image: item.image || '' });
+  const handleEdit = (item: any) =>
+    setForm({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      categoryName: item.category?.name || '',
+      sourceUrl: item.sourceUrl || '',
+      image: item.image || '',
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('Menyimpan...');
 
     try {
-      const payload = { title: form.title, description: form.description, categoryName: form.categoryName, sourceUrl: form.sourceUrl, image: form.image };
+      const payload = {
+        title: form.title,
+        description: form.description,
+        categoryName: form.categoryName,
+        sourceUrl: form.sourceUrl,
+        image: form.image,
+      };
 
       if (form.id) {
         const res = await fetch(`${getApiBaseUrl()}/api/developer/smart-magelang/${form.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' },
-          body: JSON.stringify(payload)
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Gagal update');
       } else {
         const res = await fetch(`${getApiBaseUrl()}/api/developer/smart-magelang`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' },
-          body: JSON.stringify(payload)
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Gagal buat');
       }
@@ -648,7 +759,7 @@ function SmartMagelangManager({ token }: { token?: string | null }) {
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/developer/smart-magelang/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: token ? `Bearer ${token}` : '' }
+        headers: { Authorization: token ? `Bearer ${token}` : '' },
       });
       if (!res.ok) throw new Error('Gagal hapus');
       setStatus('Terhapus');
@@ -661,14 +772,19 @@ function SmartMagelangManager({ token }: { token?: string | null }) {
   return (
     <section className="rounded-lg border border-slate-800 bg-slate-900/85 p-6">
       <h2 className="text-2xl font-semibold">Kelola Smart Magelang</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">Kelola konten Smart Magelang (artikel ringkas, sumber, dan label kategori).</p>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
+        Kelola konten Smart Magelang (artikel ringkas, sumber, dan label kategori).
+      </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <div>
           <h3 className="text-lg font-semibold">Daftar Konten</h3>
           {loading && <p className="text-slate-400">Memuat...</p>}
           {items.map((item) => (
-            <article key={item.id} className="mt-3 rounded-lg border border-slate-800 bg-slate-950/80 p-4">
+            <article
+              key={item.id}
+              className="mt-3 rounded-lg border border-slate-800 bg-slate-950/80 p-4"
+            >
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h4 className="font-semibold text-white">{item.title}</h4>
@@ -676,39 +792,95 @@ function SmartMagelangManager({ token }: { token?: string | null }) {
                   <p className="mt-2 text-xs text-slate-500">{item.category?.name}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => handleEdit(item)} className="rounded-md border px-3 py-1 text-sm text-cyan-200">Edit</button>
-                  <button onClick={() => handleDelete(item.id)} className="rounded-md border px-3 py-1 text-sm text-rose-200">Hapus</button>
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="rounded-md border px-3 py-1 text-sm text-cyan-200"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="rounded-md border px-3 py-1 text-sm text-rose-200"
+                  >
+                    Hapus
+                  </button>
                 </div>
               </div>
             </article>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-lg border border-slate-800 bg-slate-900/85 p-4">
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-lg border border-slate-800 bg-slate-900/85 p-4"
+        >
           <h3 className="text-lg font-semibold">{form.id ? 'Edit Konten' : 'Tambah Konten'}</h3>
           <label className="block text-sm font-semibold text-slate-200 mt-3">
             Judul
-            <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" required />
+            <input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+              required
+            />
           </label>
           <label className="block text-sm font-semibold text-slate-200 mt-3">
             Kategori
-            <input value={form.categoryName} onChange={(e) => setForm({ ...form, categoryName: e.target.value })} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" />
+            <input
+              value={form.categoryName}
+              onChange={(e) => setForm({ ...form, categoryName: e.target.value })}
+              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+            />
           </label>
           <label className="block text-sm font-semibold text-slate-200 mt-3">
             Ringkasan
-            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" rows={4} required />
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+              rows={4}
+              required
+            />
           </label>
           <label className="block text-sm font-semibold text-slate-200 mt-3">
             Sumber (URL)
-            <input value={form.sourceUrl} onChange={(e) => setForm({ ...form, sourceUrl: e.target.value })} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" />
+            <input
+              value={form.sourceUrl}
+              onChange={(e) => setForm({ ...form, sourceUrl: e.target.value })}
+              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+            />
           </label>
           <label className="block text-sm font-semibold text-slate-200 mt-3">
             URL Gambar
-            <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" />
+            <input
+              value={form.image}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
+              className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+            />
           </label>
           <div className="mt-4 flex gap-2">
-            <button type="submit" className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950">Simpan</button>
-            <button type="button" onClick={() => setForm({ id: '', title: '', description: '', categoryName: '', sourceUrl: '', image: '' })} className="rounded-lg border px-4 py-2 text-sm text-slate-300">Batal</button>
+            <button
+              type="submit"
+              className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950"
+            >
+              Simpan
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setForm({
+                  id: '',
+                  title: '',
+                  description: '',
+                  categoryName: '',
+                  sourceUrl: '',
+                  image: '',
+                })
+              }
+              className="rounded-lg border px-4 py-2 text-sm text-slate-300"
+            >
+              Batal
+            </button>
           </div>
           {status && <p className="mt-3 text-sm text-slate-300">{status}</p>}
         </form>
@@ -728,7 +900,7 @@ function ContentManager({
   onEdit,
   onDelete,
   onReset,
-  setStatus
+  setStatus,
 }: {
   type: DeveloperContentType;
   records: DeveloperContentItem[];
@@ -748,8 +920,6 @@ function ContentManager({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    
-
     const reader = new FileReader();
     reader.onload = () => {
       setForm({ ...form, image: String(reader.result || '') });
@@ -762,7 +932,9 @@ function ContentManager({
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <section className="rounded-lg border border-slate-800 bg-slate-900/85 p-5">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-2xl font-semibold">{sections.find((section) => section.key === type)?.label}</h2>
+          <h2 className="text-2xl font-semibold">
+            {sections.find((section) => section.key === type)?.label}
+          </h2>
           <button
             type="button"
             onClick={onReset}
@@ -775,12 +947,17 @@ function ContentManager({
 
         <div className="space-y-3">
           {records.map((item) => (
-            <article key={item.id} className="rounded-lg border border-slate-800 bg-slate-950/80 p-4">
+            <article
+              key={item.id}
+              className="rounded-lg border border-slate-800 bg-slate-950/80 p-4"
+            >
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div>
                   <h3 className="font-semibold text-white">{item.period || item.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-slate-400">{item.description}</p>
-                  <p className="mt-2 text-xs text-slate-500">{item.location || item.year || item.category || item.typeLabel}</p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    {item.location || item.year || item.category || item.typeLabel}
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -809,12 +986,29 @@ function ContentManager({
       <form onSubmit={onSubmit} className="rounded-lg border border-slate-800 bg-slate-900/85 p-5">
         <h3 className="text-xl font-semibold">{form.id ? 'Edit Konten' : 'Tambah Konten'}</h3>
         <div className="mt-5 space-y-4">
-          <input type="hidden" value={formType} onChange={(event) => setFormType(event.target.value as DeveloperContentType)} />
-          <Field label={isHistory ? 'Judul Periode' : 'Nama/Judul'} value={form.title} onChange={(value) => setForm({ ...form, title: value })} required />
+          <input
+            type="hidden"
+            value={formType}
+            onChange={(event) => setFormType(event.target.value as DeveloperContentType)}
+          />
+          <Field
+            label={isHistory ? 'Judul Periode' : 'Nama/Judul'}
+            value={form.title}
+            onChange={(value) => setForm({ ...form, title: value })}
+            required
+          />
           {isHistory && (
             <>
-              <Field label="Tahun/Periode" value={form.year || ''} onChange={(value) => setForm({ ...form, year: value })} />
-              <Field label="Nama Periode" value={form.period || ''} onChange={(value) => setForm({ ...form, period: value })} />
+              <Field
+                label="Tahun/Periode"
+                value={form.year || ''}
+                onChange={(value) => setForm({ ...form, year: value })}
+              />
+              <Field
+                label="Nama Periode"
+                value={form.period || ''}
+                onChange={(value) => setForm({ ...form, period: value })}
+              />
             </>
           )}
           <label className="block text-sm font-semibold text-slate-200">
@@ -827,27 +1021,84 @@ function ContentManager({
               required
             />
           </label>
-          <Field label="Kategori/Label" value={form.typeLabel || form.category || ''} onChange={(value) => setForm({ ...form, typeLabel: value, category: value })} />
+          <Field
+            label="Kategori/Label"
+            value={form.typeLabel || form.category || ''}
+            onChange={(value) => setForm({ ...form, typeLabel: value, category: value })}
+          />
           {isPlace && (
             <>
-              <Field label="Lokasi" value={form.location || ''} onChange={(value) => setForm({ ...form, location: value })} />
+              <Field
+                label="Lokasi"
+                value={form.location || ''}
+                onChange={(value) => setForm({ ...form, location: value })}
+              />
               <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="Latitude" type="number" value={String(form.latitude ?? '')} onChange={(value) => setForm({ ...form, latitude: value ? Number(value) : undefined })} />
-                <Field label="Longitude" type="number" value={String(form.longitude ?? '')} onChange={(value) => setForm({ ...form, longitude: value ? Number(value) : undefined })} />
+                <Field
+                  label="Latitude"
+                  type="number"
+                  value={String(form.latitude ?? '')}
+                  onChange={(value) =>
+                    setForm({ ...form, latitude: value ? Number(value) : undefined })
+                  }
+                />
+                <Field
+                  label="Longitude"
+                  type="number"
+                  value={String(form.longitude ?? '')}
+                  onChange={(value) =>
+                    setForm({ ...form, longitude: value ? Number(value) : undefined })
+                  }
+                />
               </div>
-              <Field label={type === 'culinary' ? 'Rentang Harga' : 'Jam Buka'} value={type === 'culinary' ? form.priceRange || '' : form.openingHours || ''} onChange={(value) => setForm(type === 'culinary' ? { ...form, priceRange: value } : { ...form, openingHours: value })} />
+              <Field
+                label={type === 'culinary' ? 'Rentang Harga' : 'Jam Buka'}
+                value={type === 'culinary' ? form.priceRange || '' : form.openingHours || ''}
+                onChange={(value) =>
+                  setForm(
+                    type === 'culinary'
+                      ? { ...form, priceRange: value }
+                      : { ...form, openingHours: value }
+                  )
+                }
+              />
             </>
           )}
-          <Field label="URL Gambar" value={form.image || ''} onChange={(value) => setForm({ ...form, image: value })} />
+          <Field
+            label="URL Gambar"
+            value={form.image || ''}
+            onChange={(value) => setForm({ ...form, image: value })}
+          />
           <label className="block text-sm font-semibold text-slate-200">
             Upload Gambar
             <span className="mt-2 flex items-center gap-3 rounded-lg border border-dashed border-slate-700 bg-slate-950 px-4 py-3 text-slate-400">
               <ImagePlus className="h-5 w-5 text-cyan-300" />
-              <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm" />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full text-sm"
+              />
             </span>
           </label>
-          <Field label="Link/Sumber" value={form.link || form.source || ''} onChange={(value) => setForm({ ...form, link: value, source: value })} />
-          <Field label="Detail/Tag, pisahkan koma" value={(form.details || []).join(', ')} onChange={(value) => setForm({ ...form, details: value.split(',').map((item) => item.trim()).filter(Boolean) })} />
+          <Field
+            label="Link/Sumber"
+            value={form.link || form.source || ''}
+            onChange={(value) => setForm({ ...form, link: value, source: value })}
+          />
+          <Field
+            label="Detail/Tag, pisahkan koma"
+            value={(form.details || []).join(', ')}
+            onChange={(value) =>
+              setForm({
+                ...form,
+                details: value
+                  .split(',')
+                  .map((item) => item.trim())
+                  .filter(Boolean),
+              })
+            }
+          />
           <button
             type="submit"
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-400 px-5 py-3 font-semibold text-slate-950 hover:bg-cyan-300"
@@ -863,7 +1114,7 @@ function ContentManager({
 
 function EventManager({
   eventGroups,
-  onModerate
+  onModerate,
 }: {
   eventGroups: Record<EventStatus, CommunityEvent[]>;
   onModerate: (item: CommunityEvent, status: EventStatus) => void;
@@ -872,42 +1123,78 @@ function EventManager({
     <section className="space-y-6">
       {(['pending', 'approved', 'rejected'] as EventStatus[]).map((status) => (
         <div key={status} className="rounded-lg border border-slate-800 bg-slate-900/85 p-5">
-          <h2 className="text-xl font-semibold">{statusLabel(status)} ({eventGroups[status].length})</h2>
+          <h2 className="text-xl font-semibold">
+            {statusLabel(status)} ({eventGroups[status].length})
+          </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {eventGroups[status].map((item) => (
-              <article key={item.id} className="rounded-lg border border-slate-800 bg-slate-950/80 p-4">
+              <article
+                key={item.id}
+                className="rounded-lg border border-slate-800 bg-slate-950/80 p-4"
+              >
                 <h3 className="font-semibold text-white">{item.title}</h3>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-full border border-slate-700 px-3 py-1 text-slate-300">{item.typeLabel}</span>
-                  <span className="rounded-full border border-slate-700 px-3 py-1 text-slate-300">{formatDate(item.date)}</span>
+                  <span className="rounded-full border border-slate-700 px-3 py-1 text-slate-300">
+                    {item.typeLabel}
+                  </span>
+                  <span className="rounded-full border border-slate-700 px-3 py-1 text-slate-300">
+                    {formatDate(item.date)}
+                  </span>
                   {isEventPast(item.date) && (
-                    <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-amber-200">Histori</span>
+                    <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-amber-200">
+                      Histori
+                    </span>
                   )}
                 </div>
                 <p className="mt-3 text-sm text-slate-400">{item.location}</p>
                 <p className="mt-3 line-clamp-3 text-sm text-slate-300">{item.description}</p>
                 <div className="mt-3 grid gap-2 text-xs text-slate-500">
-                  <span>Koordinat: {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}</span>
+                  <span>
+                    Koordinat: {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
+                  </span>
                   <span>Pengirim: {item.submittedBy || item.source || 'Sistem'}</span>
-                  {item.link && <a href={item.link} target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-cyan-200">Buka link event</a>}
+                  {item.link && (
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-cyan-300 hover:text-cyan-200"
+                    >
+                      Buka link event
+                    </a>
+                  )}
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button type="button" onClick={() => onModerate(item, 'approved')} className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'approved')}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
+                  >
                     <CheckCircle2 className="h-4 w-4" />
                     Publish
                   </button>
-                  <button type="button" onClick={() => onModerate(item, 'pending')} className="inline-flex items-center gap-2 rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 hover:border-amber-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'pending')}
+                    className="inline-flex items-center gap-2 rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 hover:border-amber-300"
+                  >
                     <Eye className="h-4 w-4" />
                     Pending
                   </button>
-                  <button type="button" onClick={() => onModerate(item, 'rejected')} className="inline-flex items-center gap-2 rounded-lg bg-rose-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'rejected')}
+                    className="inline-flex items-center gap-2 rounded-lg bg-rose-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300"
+                  >
                     <XCircle className="h-4 w-4" />
                     Reject
                   </button>
                 </div>
               </article>
             ))}
-            {eventGroups[status].length === 0 && <p className="text-sm text-slate-400">Tidak ada event.</p>}
+            {eventGroups[status].length === 0 && (
+              <p className="text-sm text-slate-400">Tidak ada event.</p>
+            )}
           </div>
         </div>
       ))}
@@ -917,7 +1204,7 @@ function EventManager({
 
 function CulinarySubmissionManager({
   itemGroups,
-  onModerate
+  onModerate,
 }: {
   itemGroups: Record<EventStatus, CommunityCulinary[]>;
   onModerate: (item: CommunityCulinary, status: EventStatus) => void;
@@ -926,41 +1213,77 @@ function CulinarySubmissionManager({
     <section className="space-y-6">
       {(['pending', 'approved', 'rejected'] as EventStatus[]).map((status) => (
         <div key={status} className="rounded-lg border border-slate-800 bg-slate-900/85 p-5">
-          <h2 className="text-xl font-semibold">{statusLabel(status)} Kuliner/UMKM ({itemGroups[status].length})</h2>
+          <h2 className="text-xl font-semibold">
+            {statusLabel(status)} Kuliner/UMKM ({itemGroups[status].length})
+          </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {itemGroups[status].map((item) => (
-              <article key={item.id} className="rounded-lg border border-slate-800 bg-slate-950/80 p-4">
+              <article
+                key={item.id}
+                className="rounded-lg border border-slate-800 bg-slate-950/80 p-4"
+              >
                 <div className="flex gap-4">
-                  <img src={item.image} alt={item.title} className="h-20 w-24 rounded-lg object-cover" />
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-20 w-24 rounded-lg object-cover"
+                  />
                   <div className="min-w-0">
                     <h3 className="font-semibold text-white">{item.title}</h3>
-                    <p className="mt-1 text-sm text-slate-400">{item.typeLabel} - {item.location}</p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {item.typeLabel} - {item.location}
+                    </p>
                     <p className="mt-2 line-clamp-2 text-sm text-slate-300">{item.description}</p>
                     <div className="mt-2 grid gap-1 text-xs text-slate-500">
                       <span>Harga: {item.priceRange || 'Belum diisi'}</span>
-                      <span>Koordinat: {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}</span>
+                      <span>
+                        Koordinat: {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
+                      </span>
                       <span>Pengirim: {item.submittedBy || 'User'}</span>
                     </div>
-                    {item.link && <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-semibold text-cyan-300 hover:text-cyan-200">Buka link kuliner</a>}
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                      >
+                        Buka link kuliner
+                      </a>
+                    )}
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button type="button" onClick={() => onModerate(item, 'approved')} className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'approved')}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
+                  >
                     <CheckCircle2 className="h-4 w-4" />
                     Publish
                   </button>
-                  <button type="button" onClick={() => onModerate(item, 'pending')} className="inline-flex items-center gap-2 rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 hover:border-amber-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'pending')}
+                    className="inline-flex items-center gap-2 rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 hover:border-amber-300"
+                  >
                     <Eye className="h-4 w-4" />
                     Pending
                   </button>
-                  <button type="button" onClick={() => onModerate(item, 'rejected')} className="inline-flex items-center gap-2 rounded-lg bg-rose-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'rejected')}
+                    className="inline-flex items-center gap-2 rounded-lg bg-rose-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300"
+                  >
                     <XCircle className="h-4 w-4" />
                     Reject
                   </button>
                 </div>
               </article>
             ))}
-            {itemGroups[status].length === 0 && <p className="text-sm text-slate-400">Tidak ada kuliner/UMKM.</p>}
+            {itemGroups[status].length === 0 && (
+              <p className="text-sm text-slate-400">Tidak ada kuliner/UMKM.</p>
+            )}
           </div>
         </div>
       ))}
@@ -970,7 +1293,7 @@ function CulinarySubmissionManager({
 
 function TourismSubmissionManager({
   itemGroups,
-  onModerate
+  onModerate,
 }: {
   itemGroups: Record<EventStatus, CommunityTourism[]>;
   onModerate: (item: CommunityTourism, status: EventStatus) => void;
@@ -979,40 +1302,76 @@ function TourismSubmissionManager({
     <section className="space-y-6">
       {(['pending', 'approved', 'rejected'] as EventStatus[]).map((status) => (
         <div key={status} className="rounded-lg border border-slate-800 bg-slate-900/85 p-5">
-          <h2 className="text-xl font-semibold">{statusLabel(status)} Spot Populer ({itemGroups[status].length})</h2>
+          <h2 className="text-xl font-semibold">
+            {statusLabel(status)} Spot Populer ({itemGroups[status].length})
+          </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {itemGroups[status].map((item) => (
-              <article key={item.id} className="rounded-lg border border-slate-800 bg-slate-950/80 p-4">
+              <article
+                key={item.id}
+                className="rounded-lg border border-slate-800 bg-slate-950/80 p-4"
+              >
                 <div className="flex gap-4">
-                  <img src={item.image} alt={item.title} className="h-20 w-24 rounded-lg object-cover" />
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-20 w-24 rounded-lg object-cover"
+                  />
                   <div className="min-w-0">
                     <h3 className="font-semibold text-white">{item.title}</h3>
-                    <p className="mt-1 text-sm text-slate-400">{item.typeLabel} - {item.location}</p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {item.typeLabel} - {item.location}
+                    </p>
                     <p className="mt-2 line-clamp-2 text-sm text-slate-300">{item.description}</p>
                     <div className="mt-2 grid gap-1 text-xs text-slate-500">
-                      <span>Koordinat: {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}</span>
+                      <span>
+                        Koordinat: {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
+                      </span>
                       <span>Pengirim: {item.submittedBy || 'User'}</span>
                     </div>
-                    {item.link && <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-semibold text-cyan-300 hover:text-cyan-200">Buka link spot</a>}
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                      >
+                        Buka link spot
+                      </a>
+                    )}
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button type="button" onClick={() => onModerate(item, 'approved')} className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'approved')}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
+                  >
                     <CheckCircle2 className="h-4 w-4" />
                     Publish
                   </button>
-                  <button type="button" onClick={() => onModerate(item, 'pending')} className="inline-flex items-center gap-2 rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 hover:border-amber-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'pending')}
+                    className="inline-flex items-center gap-2 rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 hover:border-amber-300"
+                  >
                     <Eye className="h-4 w-4" />
                     Pending
                   </button>
-                  <button type="button" onClick={() => onModerate(item, 'rejected')} className="inline-flex items-center gap-2 rounded-lg bg-rose-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300">
+                  <button
+                    type="button"
+                    onClick={() => onModerate(item, 'rejected')}
+                    className="inline-flex items-center gap-2 rounded-lg bg-rose-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-rose-300"
+                  >
                     <XCircle className="h-4 w-4" />
                     Reject
                   </button>
                 </div>
               </article>
             ))}
-            {itemGroups[status].length === 0 && <p className="text-sm text-slate-400">Tidak ada Spot Populer.</p>}
+            {itemGroups[status].length === 0 && (
+              <p className="text-sm text-slate-400">Tidak ada Spot Populer.</p>
+            )}
           </div>
         </div>
       ))}
@@ -1025,7 +1384,7 @@ function UserManager({
   events,
   culinarySubmissions,
   tourismSubmissions,
-  onToggle
+  onToggle,
 }: {
   users: DeveloperUser[];
   events: CommunityEvent[];
@@ -1038,24 +1397,32 @@ function UserManager({
     const userCulinary = culinarySubmissions.filter((record) => record.submittedBy === item.email);
     const userTourism = tourismSubmissions.filter((record) => record.submittedBy === item.email);
     const published = [
-      ...userEvents.filter((record) => record.status === 'approved').map((record) => `Event: ${record.title}`),
-      ...userCulinary.filter((record) => record.status === 'approved').map((record) => `Kuliner: ${record.title}`),
-      ...userTourism.filter((record) => record.status === 'approved').map((record) => `Spot: ${record.title}`)
-    ];
-    const pendingCount = [
-      ...userEvents,
-      ...userCulinary,
+      ...userEvents
+        .filter((record) => record.status === 'approved')
+        .map((record) => `Event: ${record.title}`),
+      ...userCulinary
+        .filter((record) => record.status === 'approved')
+        .map((record) => `Kuliner: ${record.title}`),
       ...userTourism
-    ].filter((record) => record.status === 'pending').length;
+        .filter((record) => record.status === 'approved')
+        .map((record) => `Spot: ${record.title}`),
+    ];
+    const pendingCount = [...userEvents, ...userCulinary, ...userTourism].filter(
+      (record) => record.status === 'pending'
+    ).length;
 
-    alert([
-      item.name,
-      item.email,
-      `Role: ${item.role}`,
-      `Published: ${published.length}`,
-      `Pending: ${pendingCount}`,
-      published.length ? `Aktivitas publish:\n- ${published.join('\n- ')}` : 'Belum ada aktivitas publish.'
-    ].join('\n'));
+    alert(
+      [
+        item.name,
+        item.email,
+        `Role: ${item.role}`,
+        `Published: ${published.length}`,
+        `Pending: ${pendingCount}`,
+        published.length
+          ? `Aktivitas publish:\n- ${published.join('\n- ')}`
+          : 'Belum ada aktivitas publish.',
+      ].join('\n')
+    );
   };
 
   return (
@@ -1081,17 +1448,27 @@ function UserManager({
                 <td className="py-4 pr-4 font-semibold text-white">{item.name}</td>
                 <td className="py-4 pr-4 text-slate-300">{item.email}</td>
                 <td className="py-4 pr-4">
-                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${item.isActive ? 'border-emerald-400/40 text-emerald-200' : 'border-rose-400/40 text-rose-200'}`}>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${item.isActive ? 'border-emerald-400/40 text-emerald-200' : 'border-rose-400/40 text-rose-200'}`}
+                  >
                     {item.isActive ? 'Aktif' : 'Nonaktif'}
                   </span>
                 </td>
                 <td className="py-4 pr-4 text-slate-300">{formatDate(item.createdAt)}</td>
                 <td className="py-4 pr-4">
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => showDetail(item)} className="rounded-lg border border-slate-700 px-3 py-2 text-cyan-200 hover:border-cyan-300">
+                    <button
+                      type="button"
+                      onClick={() => showDetail(item)}
+                      className="rounded-lg border border-slate-700 px-3 py-2 text-cyan-200 hover:border-cyan-300"
+                    >
                       Detail
                     </button>
-                    <button type="button" onClick={() => onToggle(item)} className="rounded-lg border border-rose-500/40 px-3 py-2 text-rose-200 hover:border-rose-300">
+                    <button
+                      type="button"
+                      onClick={() => onToggle(item)}
+                      className="rounded-lg border border-rose-500/40 px-3 py-2 text-rose-200 hover:border-rose-300"
+                    >
                       {item.isActive ? 'Nonaktifkan' : 'Aktifkan'}
                     </button>
                   </div>
@@ -1110,7 +1487,7 @@ function Field({
   value,
   onChange,
   type = 'text',
-  required = false
+  required = false,
 }: {
   label: string;
   value: string;

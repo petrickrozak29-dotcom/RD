@@ -30,7 +30,7 @@ describe('Category Service', () => {
 
       expect(prisma.category.findMany).toHaveBeenCalledWith({
         where: undefined,
-        orderBy: { name: 'asc' }
+        orderBy: { name: 'asc' },
       });
       expect(result).toEqual(mockCategories);
     });
@@ -43,7 +43,7 @@ describe('Category Service', () => {
 
       expect(prisma.category.findMany).toHaveBeenCalledWith({
         where: { featureType: 'KULINER' },
-        orderBy: { name: 'asc' }
+        orderBy: { name: 'asc' },
       });
       expect(result).toEqual(mockCategories);
     });
@@ -57,7 +57,7 @@ describe('Category Service', () => {
       const result = await categoryService.createCategory('Taman Rekreasi', 'WISATA');
 
       expect(prisma.category.create).toHaveBeenCalledWith({
-        data: { name: 'Taman Rekreasi', featureType: 'WISATA' }
+        data: { name: 'Taman Rekreasi', featureType: 'WISATA' },
       });
       expect(result).toEqual(mockCategory);
     });
@@ -72,7 +72,7 @@ describe('Category Service', () => {
 
       expect(prisma.category.update).toHaveBeenCalledWith({
         where: { id: '1' },
-        data: { name: 'Wisata Alam' }
+        data: { name: 'Wisata Alam' },
       });
       expect(result).toEqual(mockCategory);
     });
@@ -85,7 +85,7 @@ describe('Category Service', () => {
       await categoryService.deleteCategory('1');
 
       expect(prisma.category.delete).toHaveBeenCalledWith({
-        where: { id: '1' }
+        where: { id: '1' },
       });
     });
   });

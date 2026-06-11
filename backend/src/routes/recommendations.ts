@@ -15,7 +15,7 @@ function authenticate(req: Request, res: Response, next: any) {
 
     const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
-    
+
     (req as any).userId = decoded.userId;
     next();
   } catch (error) {
@@ -33,7 +33,7 @@ router.get('/score', authenticate, async (req: Request, res: Response) => {
 
     res.status(200).json({
       recommendations,
-      count: recommendations.length
+      count: recommendations.length,
     });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -48,7 +48,7 @@ router.post('/generate-itinerary', authenticate, async (req: Request, res: Respo
 
     if (!duration || !startTime || !interests) {
       return res.status(400).json({
-        error: 'Duration, startTime, and interests are required'
+        error: 'Duration, startTime, and interests are required',
       });
     }
 
@@ -58,7 +58,7 @@ router.post('/generate-itinerary', authenticate, async (req: Request, res: Respo
       interests: Array.isArray(interests) ? interests : [interests],
       budget: budget === undefined || budget === '' ? undefined : parseFloat(budget),
       latitude: latitude === undefined ? undefined : parseFloat(latitude),
-      longitude: longitude === undefined ? undefined : parseFloat(longitude)
+      longitude: longitude === undefined ? undefined : parseFloat(longitude),
     });
 
     res.status(200).json(itinerary);
@@ -94,10 +94,10 @@ router.get('/itineraries', authenticate, async (req: Request, res: Response) => 
     const itineraries = await prisma.savedItinerary.findMany({
       where: {
         userId,
-        isDeleted: false
+        isDeleted: false,
       },
       orderBy: {
-        createdAt: 'desc'
+        createdAt: 'desc',
       },
       select: {
         id: true,
@@ -107,8 +107,8 @@ router.get('/itineraries', authenticate, async (req: Request, res: Response) => 
         totalEstimatedCost: true,
         isCompleted: true,
         rating: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     res.status(200).json({ itineraries });
@@ -127,8 +127,8 @@ router.get('/itineraries/:id', authenticate, async (req: Request, res: Response)
       where: {
         id,
         userId,
-        isDeleted: false
-      }
+        isDeleted: false,
+      },
     });
 
     if (!itinerary) {
@@ -149,7 +149,7 @@ router.put('/itineraries/:id', authenticate, async (req: Request, res: Response)
     const { title, description, rating, feedback, isCompleted } = req.body;
 
     const itinerary = await prisma.savedItinerary.findFirst({
-      where: { id, userId, isDeleted: false }
+      where: { id, userId, isDeleted: false },
     });
 
     if (!itinerary) {
@@ -165,9 +165,9 @@ router.put('/itineraries/:id', authenticate, async (req: Request, res: Response)
         ...(feedback && { feedback }),
         ...(isCompleted !== undefined && {
           isCompleted,
-          completedAt: isCompleted ? new Date() : null
-        })
-      }
+          completedAt: isCompleted ? new Date() : null,
+        }),
+      },
     });
 
     res.status(200).json(updated);
@@ -183,7 +183,7 @@ router.delete('/itineraries/:id', authenticate, async (req: Request, res: Respon
     const { id } = req.params;
 
     const itinerary = await prisma.savedItinerary.findFirst({
-      where: { id, userId, isDeleted: false }
+      where: { id, userId, isDeleted: false },
     });
 
     if (!itinerary) {
@@ -192,7 +192,7 @@ router.delete('/itineraries/:id', authenticate, async (req: Request, res: Respon
 
     await prisma.savedItinerary.update({
       where: { id },
-      data: { isDeleted: true }
+      data: { isDeleted: true },
     });
 
     res.status(200).json({ message: 'Itinerary deleted' });
@@ -213,7 +213,7 @@ router.post('/itineraries/:id/rate', authenticate, async (req: Request, res: Res
     }
 
     const itinerary = await prisma.savedItinerary.findFirst({
-      where: { id, userId, isDeleted: false }
+      where: { id, userId, isDeleted: false },
     });
 
     if (!itinerary) {
@@ -224,8 +224,8 @@ router.post('/itineraries/:id/rate', authenticate, async (req: Request, res: Res
       where: { id },
       data: {
         rating: parseInt(rating),
-        feedback: feedback || null
-      }
+        feedback: feedback || null,
+      },
     });
 
     res.status(200).json(updated);

@@ -16,8 +16,8 @@ router.get('/', async (req, res) => {
     if (q) filters.q = q;
 
     const culinaryList = await submissionService.getSubmissions(filters);
-    
-    const mappedCulinary = culinaryList.map(item => ({
+
+    const mappedCulinary = culinaryList.map((item) => ({
       id: item.id,
       title: item.title,
       name: item.title, // For backwards compatibility
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
       typeLabel: item.category?.name,
       status: item.status.toLowerCase(),
       submittedBy: item.submittedBy?.email || item.submittedById,
-      createdAt: item.createdAt.toISOString()
+      createdAt: item.createdAt.toISOString(),
     }));
 
     res.json(mappedCulinary);

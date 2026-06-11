@@ -1,5 +1,5 @@
 const nextConfig = {
   reactStrictMode: true,
-  typedRoutes: true
+  typedRoutes: true,
 };
 export default nextConfig;

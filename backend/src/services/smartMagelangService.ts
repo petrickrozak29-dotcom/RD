@@ -10,13 +10,15 @@ export interface CreateSmartMagelangContentInput {
 }
 
 export const smartMagelangService = {
-  async getContentsByCategory(categoryName?: string): Promise<(SmartMagelangContent & { category: Category })[]> {
+  async getContentsByCategory(
+    categoryName?: string
+  ): Promise<(SmartMagelangContent & { category: Category })[]> {
     return await prisma.smartMagelangContent.findMany({
       where: categoryName ? { category: { name: categoryName } } : undefined,
       include: {
-        category: true
+        category: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
@@ -25,34 +27,44 @@ export const smartMagelangService = {
 
     // Find or create category specifically for SMART_MAGELANG
     let category = await prisma.category.findFirst({
-      where: { name: categoryName, featureType: 'SMART_MAGELANG' }
+      where: { name: categoryName, featureType: 'SMART_MAGELANG' },
     });
 
     if (!category) {
       category = await prisma.category.create({
-        data: { name: categoryName, featureType: 'SMART_MAGELANG' }
+        data: { name: categoryName, featureType: 'SMART_MAGELANG' },
       });
     }
 
     return await prisma.smartMagelangContent.create({
       data: {
         ...rest,
-        categoryId: category.id
-      }
+        categoryId: category.id,
+      },
     });
   },
 
-  async updateContent(id: string, input: Partial<CreateSmartMagelangContentInput>): Promise<SmartMagelangContent> {
+  async updateContent(
+    id: string,
+    input: Partial<CreateSmartMagelangContentInput>
+  ): Promise<SmartMagelangContent> {
     const { categoryName, ...rest } = input as any;
 
     if (categoryName) {
       // ensure category exists and belongs to SMART_MAGELANG
-      let category = await prisma.category.findFirst({ where: { name: categoryName, featureType: 'SMART_MAGELANG' } });
+      let category = await prisma.category.findFirst({
+        where: { name: categoryName, featureType: 'SMART_MAGELANG' },
+      });
       if (!category) {
-        category = await prisma.category.create({ data: { name: categoryName, featureType: 'SMART_MAGELANG' } });
+        category = await prisma.category.create({
+          data: { name: categoryName, featureType: 'SMART_MAGELANG' },
+        });
       }
 
-      return await prisma.smartMagelangContent.update({ where: { id }, data: { ...rest, categoryId: category.id } });
+      return await prisma.smartMagelangContent.update({
+        where: { id },
+        data: { ...rest, categoryId: category.id },
+      });
     }
 
     return await prisma.smartMagelangContent.update({ where: { id }, data: { ...rest } });
@@ -60,7 +72,7 @@ export const smartMagelangService = {
 
   async deleteContent(id: string): Promise<SmartMagelangContent> {
     return await prisma.smartMagelangContent.delete({
-      where: { id }
+      where: { id },
     });
-  }
+  },
 };

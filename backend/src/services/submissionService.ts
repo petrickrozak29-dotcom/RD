@@ -22,12 +22,12 @@ export const submissionService = {
 
     // Find or create category
     let category = await prisma.category.findFirst({
-      where: { name: categoryName, featureType }
+      where: { name: categoryName, featureType },
     });
 
     if (!category) {
       category = await prisma.category.create({
-        data: { name: categoryName, featureType }
+        data: { name: categoryName, featureType },
       });
     }
     const newSubmission = await prisma.submission.create({
@@ -36,7 +36,7 @@ export const submissionService = {
         featureType,
         status: 'PENDING',
         categoryId: category.id,
-      }
+      },
     });
 
     // Create a system notification for developers/admins about new submission
@@ -45,8 +45,8 @@ export const submissionService = {
         data: {
           type: 'SUBMISSION_CREATED',
           message: `New submission created: ${newSubmission.title}`,
-          payload: JSON.stringify({ submissionId: newSubmission.id, featureType })
-        }
+          payload: JSON.stringify({ submissionId: newSubmission.id, featureType }),
+        },
       });
     } catch (err) {
       console.error('Failed to create notification for new submission:', err);
@@ -55,7 +55,12 @@ export const submissionService = {
     return newSubmission;
   },
 
-  async getSubmissions(filters?: { featureType?: string; status?: string; submittedById?: string; q?: string }) {
+  async getSubmissions(filters?: {
+    featureType?: string;
+    status?: string;
+    submittedById?: string;
+    q?: string;
+  }) {
     const { q, ...rest } = filters || {};
     const where: any = { ...rest };
 
@@ -65,9 +70,9 @@ export const submissionService = {
           OR: [
             { title: { contains: q, mode: 'insensitive' } },
             { description: { contains: q, mode: 'insensitive' } },
-            { category: { name: { contains: q, mode: 'insensitive' } } }
-          ]
-        }
+            { category: { name: { contains: q, mode: 'insensitive' } } },
+          ],
+        },
       ];
     }
 
@@ -76,17 +81,17 @@ export const submissionService = {
       include: {
         category: true,
         submittedBy: {
-          select: { id: true, name: true, email: true }
-        }
+          select: { id: true, name: true, email: true },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
   async updateStatus(id: string, status: 'PENDING' | 'APPROVED' | 'REJECTED'): Promise<Submission> {
     const updated = await prisma.submission.update({
       where: { id },
-      data: { status }
+      data: { status },
     });
 
     // Notify submitter about status change
@@ -97,8 +102,8 @@ export const submissionService = {
             userId: updated.submittedById,
             type: 'SUBMISSION_STATUS_CHANGED',
             message: `Submission \"${updated.title}\" status changed to ${updated.status.toLowerCase()}`,
-            payload: JSON.stringify({ submissionId: updated.id, status: updated.status })
-          }
+            payload: JSON.stringify({ submissionId: updated.id, status: updated.status }),
+          },
         });
       }
 
@@ -108,8 +113,8 @@ export const submissionService = {
           data: {
             type: 'SUBMISSION_PUBLISHED',
             message: `Submission \"${updated.title}\" has been published`,
-            payload: JSON.stringify({ submissionId: updated.id })
-          }
+            payload: JSON.stringify({ submissionId: updated.id }),
+          },
         });
       }
     } catch (err) {
@@ -121,7 +126,7 @@ export const submissionService = {
 
   async deleteSubmission(id: string): Promise<Submission> {
     return await prisma.submission.delete({
-      where: { id }
+      where: { id },
     });
-  }
+  },
 };

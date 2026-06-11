@@ -4,13 +4,13 @@ import prisma from './prismaClient';
 export const featureToggleService = {
   async getAllFeatures(): Promise<FeatureToggle[]> {
     return await prisma.featureToggle.findMany({
-      orderBy: { name: 'asc' }
+      orderBy: { name: 'asc' },
     });
   },
 
   async getFeatureByName(name: string): Promise<FeatureToggle | null> {
     return await prisma.featureToggle.findUnique({
-      where: { name }
+      where: { name },
     });
   },
 
@@ -18,7 +18,7 @@ export const featureToggleService = {
     return await prisma.featureToggle.upsert({
       where: { name },
       update: { isActive },
-      create: { name, isActive, description: `Feature ${name}` }
+      create: { name, isActive, description: `Feature ${name}` },
     });
   },
 
@@ -28,5 +28,5 @@ export const featureToggleService = {
     // Assuming default is true for essential features.
     if (!feature) return true;
     return feature.isActive;
-  }
+  },
 };

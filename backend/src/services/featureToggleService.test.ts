@@ -31,7 +31,7 @@ describe('Feature Toggle Service', () => {
       const result = await featureToggleService.getAllFeatures();
 
       expect(prisma.featureToggle.findMany).toHaveBeenCalledWith({
-        orderBy: { name: 'asc' }
+        orderBy: { name: 'asc' },
       });
       expect(result).toEqual(mockFeatures);
     });
@@ -45,7 +45,7 @@ describe('Feature Toggle Service', () => {
       const result = await featureToggleService.getFeatureByName('Event');
 
       expect(prisma.featureToggle.findUnique).toHaveBeenCalledWith({
-        where: { name: 'Event' }
+        where: { name: 'Event' },
       });
       expect(result).toEqual(mockFeature);
     });
@@ -69,7 +69,7 @@ describe('Feature Toggle Service', () => {
       expect(prisma.featureToggle.upsert).toHaveBeenCalledWith({
         where: { name: 'Event' },
         update: { isActive: false },
-        create: { name: 'Event', isActive: false, description: 'Feature Event' }
+        create: { name: 'Event', isActive: false, description: 'Feature Event' },
       });
       expect(result).toEqual(mockFeature);
     });

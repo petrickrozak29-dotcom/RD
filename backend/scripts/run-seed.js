@@ -7,7 +7,10 @@
     const loginRes = await fetch(`${base}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'developermagelang45@gmail.com', password: 'potensimagelang45#' })
+      body: JSON.stringify({
+        email: 'developermagelang45@gmail.com',
+        password: 'potensimagelang45#',
+      }),
     });
 
     const loginBody = await loginRes.json();
@@ -23,7 +26,7 @@
     console.log('[SEED] Calling /api/seed/run...');
     const res = await fetch(`${base}/api/seed/run`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     const body = await res.json();

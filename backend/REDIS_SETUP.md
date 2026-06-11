@@ -3,6 +3,7 @@
 ## Overview
 
 This application uses Redis as a caching layer to improve performance for:
+
 - User location data (1 minute TTL)
 - Nearby destinations (5 minutes TTL)
 - Distance calculations (5 minutes TTL)
@@ -14,21 +15,27 @@ This application uses Redis as a caching layer to improve performance for:
 ## Features
 
 ### ✅ Connection Pooling
+
 Redis client is configured with automatic connection management and pooling for optimal performance.
 
 ### ✅ Error Handling & Fallback
+
 - Automatic fallback to in-memory cache when Redis is unavailable
 - Graceful degradation ensures application continues working
 - Automatic retry with exponential backoff
 
 ### ✅ TTL Strategies
+
 Different cache TTLs based on data volatility:
+
 - **Frequent updates** (1 min): Current user location
 - **Moderate updates** (5-10 min): Nearby destinations, distances, preferences
 - **Stable data** (30 min - 24 hours): Recommendations, AI insights
 
 ### ✅ Cache Invalidation
+
 Automatic cache invalidation when:
+
 - User updates preferences → Clear recommendations
 - User location changes → Update location cache
 - Destination data changes → Clear related caches
@@ -120,7 +127,7 @@ await cacheService.cacheUserLocation('user123', {
   latitude: 7.4728,
   longitude: 110.2122,
   accuracy: 10,
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString(),
 });
 
 // Get cached location
@@ -141,7 +148,7 @@ import cacheService from './services/cacheService';
 // Track login attempts
 const { attempts, remaining } = await cacheService.trackRateLimit(
   `login:${ipAddress}`,
-  5,  // max 5 attempts
+  5, // max 5 attempts
   900 // within 15 minutes
 );
 
@@ -153,31 +160,37 @@ if (remaining === 0) {
 ## Cache Strategies by Data Type
 
 ### User Location (TTL: 1 minute)
+
 - **Why**: Location updates frequently as user moves
 - **Invalidation**: On new location update
 - **Key pattern**: `location:current:{userId}`
 
 ### Nearby Destinations (TTL: 5 minutes)
+
 - **Why**: Destination list doesn't change often
 - **Invalidation**: When user moves significantly or preferences change
 - **Key pattern**: `destinations:nearby:{userId}:{radius}`
 
 ### Distance Calculations (TTL: 5 minutes)
+
 - **Why**: Haversine calculations are expensive, results stable
 - **Invalidation**: When user location updates
 - **Key pattern**: `distance:{userId}:{destinationId}`
 
 ### Recommendations (TTL: 30 minutes)
+
 - **Why**: Scoring algorithm is compute-intensive
 - **Invalidation**: When user preferences change
 - **Key pattern**: `recommendations:{userId}`
 
 ### AI Insights (TTL: 24 hours)
+
 - **Why**: LLM API calls are expensive and slow, content rarely changes
 - **Invalidation**: Manual or scheduled refresh
 - **Key pattern**: `ai:insights:{destinationId}`
 
 ### User Preferences (TTL: 10 minutes)
+
 - **Why**: Database reads are fast but frequent
 - **Invalidation**: When user updates preferences
 - **Key pattern**: `preferences:{userId}`
@@ -217,12 +230,14 @@ console.log('Redis Healthy:', isHealthy);
 ## Fallback Behavior
 
 When Redis is unavailable:
+
 - Application automatically switches to in-memory cache
 - All cache operations continue working seamlessly
 - Warning logged: `[Redis] Using in-memory fallback cache`
 - Health endpoint shows: `"usesFallback": true`
 
 ### Performance Impact
+
 - In-memory cache is fast but not distributed
 - Data lost on application restart
 - No shared cache across multiple instances
@@ -243,7 +258,9 @@ npm test:coverage
 ```
 
 ### Test Results
+
 All 18 tests should pass, covering:
+
 - ✅ Basic CRUD operations
 - ✅ TTL management
 - ✅ Pattern operations
@@ -255,18 +272,21 @@ All 18 tests should pass, covering:
 ## Production Considerations
 
 ### Security
+
 1. **Use strong Redis password** in production
 2. **Enable SSL/TLS** for Redis connections
 3. **Restrict network access** to Redis port (6379)
 4. **Use Redis ACLs** to limit command access
 
 ### Performance
+
 1. **Monitor memory usage** - Set maxmemory limit
 2. **Configure eviction policy** - Recommend `volatile-lru`
 3. **Use connection pooling** - Already configured
 4. **Monitor slow queries** - Use Redis SLOWLOG
 
 ### High Availability
+
 1. **Redis Sentinel** - Automatic failover
 2. **Redis Cluster** - Horizontal scaling
 3. **Backup strategy** - Regular RDB/AOF snapshots
@@ -285,28 +305,37 @@ tcp-keepalive 60
 ## Troubleshooting
 
 ### Redis Connection Failed
+
 ```
 Error: [Redis] Failed to connect
 ```
-**Solution**: 
+
+**Solution**:
+
 - Check if Redis is running: `redis-cli ping` (should return "PONG")
 - Verify REDIS_URL in .env
 - Check firewall/network settings
 
 ### Fallback Cache Active
+
 ```
 Warning: [Redis] Using in-memory fallback cache
 ```
+
 **Solution**:
+
 - This is normal if Redis not installed
 - Install Redis for better performance
 - No action needed for development
 
 ### Tests Failing
+
 ```
 Error: Connection timeout
 ```
+
 **Solution**:
+
 - Tests work with fallback cache (no Redis needed)
 - Increase test timeout in jest.config.js
 - Check network/firewall blocking localhost:6379
@@ -314,12 +343,14 @@ Error: Connection timeout
 ## Performance Benchmarks
 
 With Redis (typical):
+
 - `GET` operation: < 1ms
 - `SET` operation: < 1ms
 - `getJSON` operation: < 2ms
 - `setJSON` operation: < 2ms
 
 With Fallback (in-memory):
+
 - `GET` operation: < 0.1ms
 - `SET` operation: < 0.1ms
 - `getJSON` operation: < 0.5ms
@@ -328,6 +359,7 @@ With Fallback (in-memory):
 ## Support
 
 For issues or questions:
+
 1. Check Redis logs: `redis-cli monitor`
 2. Review application logs for `[Redis]` messages
 3. Check health endpoint: `/api/health`

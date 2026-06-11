@@ -38,7 +38,12 @@ async function main() {
     WISATA: ['Alam', 'Sejarah', 'Taman Rekreasi', 'Spot Populer'],
     KULINER: ['Makanan Khas', 'Pusat Kuliner', 'UMKM', 'Kopi dan Kafe'],
     EVENT: ['Konser Musik', 'Seni & Budaya', 'Pameran', 'Agenda Lokal'],
-    SMART_MAGELANG: ['Infrastruktur Teknologi', 'Internet dan Jaringan Komunikasi', 'Digitalisasi Layanan Publik', 'Pengembangan Smart City']
+    SMART_MAGELANG: [
+      'Infrastruktur Teknologi',
+      'Internet dan Jaringan Komunikasi',
+      'Digitalisasi Layanan Publik',
+      'Pengembangan Smart City',
+    ],
   };
 
   for (const [featureType, categories] of Object.entries(defaultCategories)) {

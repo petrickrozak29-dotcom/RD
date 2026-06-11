@@ -13,8 +13,8 @@ router.get('/', async (_req, res) => {
         role: true,
         isActive: true,
         createdAt: true,
-        lastLogin: true
-      }
+        lastLogin: true,
+      },
     });
     res.json(users);
   } catch (error) {

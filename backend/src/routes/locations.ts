@@ -14,7 +14,7 @@ function authenticate(req: Request, res: Response, next: any) {
 
     const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
-    
+
     (req as any).userId = decoded.userId;
     next();
   } catch (error) {
@@ -30,7 +30,7 @@ router.post('/update', authenticate, async (req: Request, res: Response) => {
 
     if (latitude === undefined || longitude === undefined) {
       return res.status(400).json({
-        error: 'Latitude and longitude are required'
+        error: 'Latitude and longitude are required',
       });
     }
 
@@ -41,7 +41,7 @@ router.post('/update', authenticate, async (req: Request, res: Response) => {
       altitude: altitude ? parseFloat(altitude) : undefined,
       speed: speed ? parseFloat(speed) : undefined,
       source,
-      deviceId
+      deviceId,
     });
 
     res.status(200).json(location);
@@ -104,7 +104,7 @@ router.get('/nearby', authenticate, async (req: Request, res: Response) => {
 
     res.status(200).json({
       destinations: nearby,
-      count: nearby.length
+      count: nearby.length,
     });
   } catch (error: any) {
     res.status(400).json({ error: error.message });

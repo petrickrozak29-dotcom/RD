@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,8 @@ import GradientBg from '../../components/gradient-bg';
 export default function LoginPage() {
   const router = useRouter();
   const { login, register } = useAuth();
-  const nextParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('next') : null;
+  const nextParam =
+    typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('next') : null;
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
@@ -48,16 +49,21 @@ export default function LoginPage() {
       } else {
         const loggedInUser = await login(email.trim(), password);
         const target = nextParam || (loggedInUser.role === 'ADMIN' ? '/developer' : '/smart-map');
-        setStatus(loggedInUser.role === 'ADMIN'
-          ? 'Login developer berhasil. Mengarahkan ke Dashboard Developer...'
-          : 'Login berhasil. Mengarahkan ke Smart Map...'
+        setStatus(
+          loggedInUser.role === 'ADMIN'
+            ? 'Login developer berhasil. Mengarahkan ke Dashboard Developer...'
+            : 'Login berhasil. Mengarahkan ke Smart Map...'
         );
-        setTimeout(() => { window.location.href = target; }, 900);
+        setTimeout(() => {
+          window.location.href = target;
+        }, 900);
         return;
       }
 
       const target = nextParam || '/smart-map';
-      setTimeout(() => { window.location.href = target; }, 900);
+      setTimeout(() => {
+        window.location.href = target;
+      }, 900);
     } catch (error: any) {
       setStatus(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
       setLoading(false);
@@ -70,7 +76,9 @@ export default function LoginPage() {
       <main className="mx-auto flex min-h-[78vh] max-w-6xl items-center justify-center px-4 py-10 text-white sm:px-6">
         <section className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-900/85 p-6 shadow-2xl sm:p-8">
           <div className="mb-6">
-            <h1 className="mt-2 text-3xl font-bold text-white">{mode === 'login' ? 'Login' : 'Register'}</h1>
+            <h1 className="mt-2 text-3xl font-bold text-white">
+              {mode === 'login' ? 'Login' : 'Register'}
+            </h1>
           </div>
 
           <div className="mb-6 grid grid-cols-2 rounded-lg border border-slate-800 bg-slate-950 p-1">
@@ -173,7 +181,9 @@ export default function LoginPage() {
             </button>
 
             {status && (
-              <p className={`text-sm ${status.includes('berhasil') ? 'text-emerald-300' : 'text-rose-300'}`}>
+              <p
+                className={`text-sm ${status.includes('berhasil') ? 'text-emerald-300' : 'text-rose-300'}`}
+              >
                 {status}
               </p>
             )}

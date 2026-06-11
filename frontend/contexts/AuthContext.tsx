@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -43,7 +43,7 @@ const REFRESH_TOKEN_KEY = 'refreshToken';
 function readStoredUser() {
   try {
     const raw = localStorage.getItem(AUTH_USER_KEY);
-    return raw ? JSON.parse(raw) as User : null;
+    return raw ? (JSON.parse(raw) as User) : null;
   } catch {
     return null;
   }
@@ -85,13 +85,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${nextToken}`
+            Authorization: `Bearer ${nextToken}`,
           },
           body: JSON.stringify({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          })
+            accuracy: position.coords.accuracy,
+          }),
         });
       } catch {
         // Location sync should not block login on mobile networks.
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await apiJson<{ token: string; expiresIn: number }>('/api/auth/refresh', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: storedRefreshToken })
+        body: JSON.stringify({ refreshToken: storedRefreshToken }),
       });
 
       localStorage.setItem(AUTH_TOKEN_KEY, data.token);
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         try {
           const profile = await apiJson<{ user: User }>('/api/auth/me', {
-            headers: { Authorization: `Bearer ${storedToken}` }
+            headers: { Authorization: `Bearer ${storedToken}` },
           });
 
           if (mounted) {
@@ -161,7 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await apiJson<AuthResponse>('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       persistSession(data);
@@ -180,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await apiJson<AuthResponse>('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password }),
       });
 
       persistSession(data);
@@ -204,9 +204,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(result.user));
@@ -233,9 +233,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
     } catch (error: any) {
       if (error instanceof TypeError) {
@@ -263,7 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshSession,
         isAuthenticated: !!token,
         loading,
-        apiBaseUrl: getApiBaseUrl()
+        apiBaseUrl: getApiBaseUrl(),
       }}
     >
       {children}

@@ -30,7 +30,7 @@ Target Users: Pengunjung umum website Magelang yang ingin mengeksplorasi destina
    - Mengandung uppercase (A-Z)
    - Mengandung lowercase (a-z)
    - Mengandung digit (0-9)
-   - Mengandung special character (!@#$%^&*)
+   - Mengandung special character (!@#$%^&\*)
 4. System SHALL validate email belum terdaftar (unique constraint) and reject duplicate dengan HTTP 409
 5. System SHALL hash password dengan bcrypt (min 10 rounds) sebelum disimpan ke database
 6. System SHALL return HTTP 201 Created dengan user object (tanpa password) pada successful registration
@@ -286,7 +286,7 @@ Target Users: Pengunjung umum website Magelang yang ingin mengeksplorasi destina
 4. FOR each destination System SHALL calculate composite score (0-100):
    - Distance score (30%): closer = higher
    - Category relevance (35%): match user interests
-   - Rating score (20%): destination rating/5 * 20
+   - Rating score (20%): destination rating/5 \* 20
    - Budget compatibility (15%): based on price range
    - Accessibility (10%): based on mobility level
 5. System SHALL filter destinations dengan distance <= maxDistance from preferences

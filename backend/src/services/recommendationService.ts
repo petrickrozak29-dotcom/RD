@@ -7,7 +7,7 @@ import { submissionService } from './submissionService';
 let openai: OpenAI | null = null;
 if (process.env.OPENAI_API_KEY) {
   openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY,
   });
 }
 
@@ -51,12 +51,12 @@ interface ItineraryResult {
 // Calculate max distance based on mobility level
 function calculateMaxDistance(mobilityLevel: number): number {
   // mobilityLevel 1-10, returns distance in km
-  return 5 + (mobilityLevel * 2); // Range: 7-25 km
+  return 5 + mobilityLevel * 2; // Range: 7-25 km
 }
 
 const MAGELANG_CENTER = {
   latitude: -7.4797,
-  longitude: 110.2177
+  longitude: 110.2177,
 };
 
 interface RouteCandidate {
@@ -80,8 +80,11 @@ function matchesInterest(candidate: any, interests: string[]) {
     candidate.typeLabel,
     candidate.name,
     candidate.title,
-    candidate.description
-  ].filter(Boolean).join(' ').toLowerCase();
+    candidate.description,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
 
   return interests.some((interest) => {
     if (interest === 'kuliner') return candidate.kind === 'kuliner';
@@ -98,11 +101,7 @@ function slugify(value: string) {
     .replace(/(^-|-$)+/g, '');
 }
 
-async function resolveTripOrigin(
-  userId: string,
-  latitude?: number,
-  longitude?: number
-) {
+async function resolveTripOrigin(userId: string, latitude?: number, longitude?: number) {
   if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
     return { latitude: Number(latitude), longitude: Number(longitude) };
   }
@@ -111,7 +110,7 @@ async function resolveTripOrigin(
     const savedLocation = await getUserLocation(userId);
     return {
       latitude: savedLocation.latitude,
-      longitude: savedLocation.longitude
+      longitude: savedLocation.longitude,
     };
   } catch {
     return MAGELANG_CENTER;
@@ -123,25 +122,44 @@ async function getRouteCandidates(
   selectedInterests: string[]
 ): Promise<RouteCandidate[]> {
   const dbTourism = await prisma.tourism.findMany().catch(() => []);
-  const tourismRecordsDb = dbTourism.length > 0
-    ? dbTourism.map((item) => ({ ...item, kind: 'wisata' }))
-    : [];
+  const tourismRecordsDb =
+    dbTourism.length > 0 ? dbTourism.map((item) => ({ ...item, kind: 'wisata' })) : [];
 
   const submissions = await submissionService.getSubmissions({ status: 'APPROVED' });
-  
+
   const tourismRecordsSub = submissions
-    .filter((item) => item.featureType === 'WISATA' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
+    .filter(
+      (item) =>
+        item.featureType === 'WISATA' &&
+        Number.isFinite(item.latitude) &&
+        Number.isFinite(item.longitude)
+    )
     .map((item) => ({ ...item, name: item.title, kind: 'wisata' }));
 
   const culinaryRecords = submissions
-    .filter((item) => item.featureType === 'KULINER' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
+    .filter(
+      (item) =>
+        item.featureType === 'KULINER' &&
+        Number.isFinite(item.latitude) &&
+        Number.isFinite(item.longitude)
+    )
     .map((item) => ({ ...item, name: item.title, kind: 'kuliner' }));
-    
+
   const eventRecords = submissions
-    .filter((item) => item.featureType === 'EVENT' && Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
+    .filter(
+      (item) =>
+        item.featureType === 'EVENT' &&
+        Number.isFinite(item.latitude) &&
+        Number.isFinite(item.longitude)
+    )
     .map((item) => ({ ...item, name: item.title, kind: 'event' }));
 
-  const allCandidates = [...tourismRecordsDb, ...tourismRecordsSub, ...culinaryRecords, ...eventRecords];
+  const allCandidates = [
+    ...tourismRecordsDb,
+    ...tourismRecordsSub,
+    ...culinaryRecords,
+    ...eventRecords,
+  ];
   const matched = allCandidates.filter((item) => matchesInterest(item, selectedInterests));
   const source = matched.length > 0 ? matched : allCandidates;
 
@@ -151,7 +169,8 @@ async function getRouteCandidates(
       const latitude = Number(record.latitude);
       const longitude = Number(record.longitude);
       const distance = haversineDistance(origin.latitude, origin.longitude, latitude, longitude);
-      const mapPrefix = record.kind === 'event' ? 'event' : record.kind === 'kuliner' ? 'kuliner' : 'wisata';
+      const mapPrefix =
+        record.kind === 'event' ? 'event' : record.kind === 'kuliner' ? 'kuliner' : 'wisata';
       const mapId = record.mapId || `${mapPrefix}-${slugify(record.name || record.title)}`;
 
       return {
@@ -159,17 +178,24 @@ async function getRouteCandidates(
           ...record,
           id: String(record.id),
           name: record.name || record.title,
-          category: record.kind === 'kuliner' ? 'Kuliner' : record.kind === 'event' ? record.category?.name || 'Event' : record.category?.name || 'Wisata',
+          category:
+            record.kind === 'kuliner'
+              ? 'Kuliner'
+              : record.kind === 'event'
+                ? record.category?.name || 'Event'
+                : record.category?.name || 'Wisata',
           mapId,
           detailUrl: `/smart-map?focus=${mapId}`,
-          link: record.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(record.name || record.title)}`,
+          link:
+            record.link ||
+            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(record.name || record.title)}`,
           latitude,
-          longitude
+          longitude,
         },
         latitude,
         longitude,
         distance,
-        estimatedTravelTime: Math.max(5, Math.ceil((distance / 35) * 60))
+        estimatedTravelTime: Math.max(5, Math.ceil((distance / 35) * 60)),
       };
     })
     .filter((item) => Number.isFinite(item.latitude) && Number.isFinite(item.longitude))
@@ -185,7 +211,7 @@ export async function scoreDestinations(
 
   // Get user preferences
   const preferences = await prisma.userPreferences.findUnique({
-    where: { userId }
+    where: { userId },
   });
 
   if (!preferences) {
@@ -195,11 +221,12 @@ export async function scoreDestinations(
   // Get all tourism destinations
   const destinations = await prisma.tourism.findMany();
 
-  const maxDistance = preferences.distancePreference || calculateMaxDistance(preferences.mobilityLevel);
+  const maxDistance =
+    preferences.distancePreference || calculateMaxDistance(preferences.mobilityLevel);
 
   // Score each destination
   const scored: ScoredDestination[] = destinations
-    .map(dest => {
+    .map((dest) => {
       // Calculate distance
       const distance = haversineDistance(
         userLocation.latitude,
@@ -238,7 +265,8 @@ export async function scoreDestinations(
       const accessibilityScore = Math.min(10, preferences.mobilityLevel);
 
       // Total score
-      const totalScore = distanceScore + categoryRelevance + ratingScore + budgetScore + accessibilityScore;
+      const totalScore =
+        distanceScore + categoryRelevance + ratingScore + budgetScore + accessibilityScore;
 
       // Estimate travel time (40 km/h average)
       const estimatedTravelTime = Math.ceil((distance / 40) * 60);
@@ -260,8 +288,8 @@ export async function scoreDestinations(
           categoryRelevance,
           ratingScore: Math.round(ratingScore * 100) / 100,
           budgetScore,
-          accessibilityScore
-        }
+          accessibilityScore,
+        },
       };
     })
     .filter((item): item is ScoredDestination => item !== null)
@@ -324,12 +352,14 @@ export async function generateItinerary(
         return {
           ...candidate,
           distance,
-          estimatedTravelTime: Math.max(5, Math.ceil((distance / 35) * 60))
+          estimatedTravelTime: Math.max(5, Math.ceil((distance / 35) * 60)),
         };
       })
       .sort((a, b) => a.distance - b.distance);
 
-    const next = nearestCandidates.find((candidate) => candidate.estimatedTravelTime + 30 <= remainingTime);
+    const next = nearestCandidates.find(
+      (candidate) => candidate.estimatedTravelTime + 30 <= remainingTime
+    );
     if (!next) break;
 
     const stayTime = Math.min(90, Math.max(30, remainingTime - next.estimatedTravelTime));
@@ -346,10 +376,11 @@ export async function generateItinerary(
       travelTime: next.estimatedTravelTime,
       distance: next.distance,
       estimatedCost,
-      notes: next.destination.kind === 'kuliner'
-        ? 'Cocok untuk jeda kuliner tanpa keluar jauh dari rute.'
-        : 'Nikmati destinasi ini sesuai waktu kunjungan yang tersedia.',
-      directions: `${next.distance.toFixed(1)} km dari titik sebelumnya, estimasi ${next.estimatedTravelTime} menit perjalanan`
+      notes:
+        next.destination.kind === 'kuliner'
+          ? 'Cocok untuk jeda kuliner tanpa keluar jauh dari rute.'
+          : 'Nikmati destinasi ini sesuai waktu kunjungan yang tersedia.',
+      directions: `${next.distance.toFixed(1)} km dari titik sebelumnya, estimasi ${next.estimatedTravelTime} menit perjalanan`,
     });
 
     currentTime = endTime;
@@ -360,7 +391,10 @@ export async function generateItinerary(
   }
 
   const totalCost = itinerary.reduce((sum, item) => sum + item.estimatedCost, 0);
-  const totalDuration = itinerary.reduce((sum, item) => sum + item.stayDuration + item.travelTime, 0);
+  const totalDuration = itinerary.reduce(
+    (sum, item) => sum + item.stayDuration + item.travelTime,
+    0
+  );
 
   // Generate AI summary
   let summary = '';
@@ -374,38 +408,49 @@ export async function generateItinerary(
         model: 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 150,
-        temperature: 0.7
+        temperature: 0.7,
       });
 
       summary = completion.choices[0]?.message?.content || 'Enjoy your trip to Magelang!';
       tips = [
         'Cek jam buka destinasi sebelum berangkat',
         'Siapkan uang tunai untuk parkir dan UMKM',
-        'Ikuti urutan rute agar perjalanan tidak bolak-balik'
+        'Ikuti urutan rute agar perjalanan tidak bolak-balik',
       ];
     } else {
       // Fallback if OpenAI not available
       summary = `Itinerary ${duration} jam ini berisi ${itinerary.length} rekomendasi di Magelang, dimulai dari pukul ${startTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}. Rute diurutkan dari titik terdekat agar perjalanan efisien. Total jarak sekitar ${totalDistance.toFixed(1)} km.`;
-      tips = ['Cek jam buka destinasi', 'Gunakan urutan rute dari AI', 'Siapkan uang tunai', 'Perhatikan cuaca sebelum berangkat'];
+      tips = [
+        'Cek jam buka destinasi',
+        'Gunakan urutan rute dari AI',
+        'Siapkan uang tunai',
+        'Perhatikan cuaca sebelum berangkat',
+      ];
     }
   } catch (error) {
     // Fallback if OpenAI fails
     summary = `Itinerary ${duration} jam ini berisi ${itinerary.length} rekomendasi di Magelang dengan total jarak sekitar ${totalDistance.toFixed(1)} km.`;
-    tips = ['Cek jam buka destinasi', 'Gunakan urutan rute dari AI', 'Perhatikan cuaca sebelum berangkat'];
+    tips = [
+      'Cek jam buka destinasi',
+      'Gunakan urutan rute dari AI',
+      'Perhatikan cuaca sebelum berangkat',
+    ];
   }
 
   // Save itinerary
-  await prisma.savedItinerary.create({
-    data: {
-      userId,
-      title: `Smart Magelang - ${startTime.toLocaleDateString()}`,
-      description: summary,
-      items: JSON.stringify(itinerary),
-      duration: totalDuration,
-      totalDistance,
-      totalEstimatedCost: totalCost
-    }
-  }).catch(() => undefined);
+  await prisma.savedItinerary
+    .create({
+      data: {
+        userId,
+        title: `Smart Magelang - ${startTime.toLocaleDateString()}`,
+        description: summary,
+        items: JSON.stringify(itinerary),
+        duration: totalDuration,
+        totalDistance,
+        totalEstimatedCost: totalCost,
+      },
+    })
+    .catch(() => undefined);
 
   return {
     itinerary,
@@ -413,13 +458,13 @@ export async function generateItinerary(
     totalCost,
     totalDuration,
     summary,
-    tips
+    tips,
   };
 }
 
 export async function getDestinationInsights(destinationId: string): Promise<any> {
   const destination = await prisma.tourism.findUnique({
-    where: { id: destinationId }
+    where: { id: destinationId },
   });
 
   if (!destination) {
@@ -434,7 +479,7 @@ export async function getDestinationInsights(destinationId: string): Promise<any
         model: 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 200,
-        temperature: 0.7
+        temperature: 0.7,
       });
 
       const aiResponse = completion.choices[0]?.message?.content || '';
@@ -443,19 +488,28 @@ export async function getDestinationInsights(destinationId: string): Promise<any
         destinationId,
         tips: ['Arrive early to avoid crowds', 'Parking available', 'Local guide recommended'],
         bestTimeToVisit: 'Tuesday-Thursday mornings, 8-11 AM',
-        localRecommendations: ['Try local specialty nearby', 'Don\'t miss sunset view'],
+        localRecommendations: ['Try local specialty nearby', "Don't miss sunset view"],
         historicalInfo: aiResponse,
-        estimatedVisitTime: 120
+        estimatedVisitTime: 120,
       };
     } else {
       // Fallback without OpenAI
       return {
         destinationId,
-        tips: ['Arrive early to avoid crowds', 'Parking available', 'Local guide recommended', 'Bring water and sunscreen'],
+        tips: [
+          'Arrive early to avoid crowds',
+          'Parking available',
+          'Local guide recommended',
+          'Bring water and sunscreen',
+        ],
         bestTimeToVisit: 'Weekday mornings (8-11 AM) for best experience',
-        localRecommendations: ['Explore nearby areas', 'Try local cuisine', 'Ask locals for hidden gems'],
+        localRecommendations: [
+          'Explore nearby areas',
+          'Try local cuisine',
+          'Ask locals for hidden gems',
+        ],
         historicalInfo: destination.description,
-        estimatedVisitTime: 90
+        estimatedVisitTime: 90,
       };
     }
   } catch (error) {
@@ -466,7 +520,7 @@ export async function getDestinationInsights(destinationId: string): Promise<any
       bestTimeToVisit: 'Weekday mornings',
       localRecommendations: ['Explore nearby areas'],
       historicalInfo: destination.description,
-      estimatedVisitTime: 90
+      estimatedVisitTime: 90,
     };
   }
 }

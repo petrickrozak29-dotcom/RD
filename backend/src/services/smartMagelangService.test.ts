@@ -34,7 +34,7 @@ describe('Smart Magelang Service', () => {
       expect(prisma.smartMagelangContent.findMany).toHaveBeenCalledWith({
         where: undefined,
         include: { category: true },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
       expect(result).toEqual(mockContents);
     });
@@ -48,7 +48,7 @@ describe('Smart Magelang Service', () => {
       expect(prisma.smartMagelangContent.findMany).toHaveBeenCalledWith({
         where: { category: { name: 'Infrastruktur' } },
         include: { category: true },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
       expect(result).toEqual(mockContents);
     });
@@ -66,21 +66,21 @@ describe('Smart Magelang Service', () => {
       const result = await smartMagelangService.createContent({
         title: 'Free WiFi',
         description: 'Internet publik',
-        categoryName: 'Infrastruktur'
+        categoryName: 'Infrastruktur',
       });
 
       expect(prisma.category.findFirst).toHaveBeenCalledWith({
-        where: { name: 'Infrastruktur', featureType: 'SMART_MAGELANG' }
+        where: { name: 'Infrastruktur', featureType: 'SMART_MAGELANG' },
       });
       expect(prisma.category.create).toHaveBeenCalledWith({
-        data: { name: 'Infrastruktur', featureType: 'SMART_MAGELANG' }
+        data: { name: 'Infrastruktur', featureType: 'SMART_MAGELANG' },
       });
       expect(prisma.smartMagelangContent.create).toHaveBeenCalledWith({
         data: {
           title: 'Free WiFi',
           description: 'Internet publik',
-          categoryId: 'cat-1'
-        }
+          categoryId: 'cat-1',
+        },
       });
       expect(result).toEqual(mockContent);
     });
@@ -95,13 +95,13 @@ describe('Smart Magelang Service', () => {
       const result = await smartMagelangService.createContent({
         title: 'Free WiFi',
         description: 'Internet publik',
-        categoryName: 'Infrastruktur'
+        categoryName: 'Infrastruktur',
       });
 
       expect(prisma.category.findFirst).toHaveBeenCalled();
       expect(prisma.category.create).not.toHaveBeenCalled();
       expect(prisma.smartMagelangContent.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ categoryId: 'cat-2' })
+        data: expect.objectContaining({ categoryId: 'cat-2' }),
       });
       expect(result).toEqual(mockContent);
     });
@@ -114,7 +114,7 @@ describe('Smart Magelang Service', () => {
       await smartMagelangService.deleteContent('content-1');
 
       expect(prisma.smartMagelangContent.delete).toHaveBeenCalledWith({
-        where: { id: 'content-1' }
+        where: { id: 'content-1' },
       });
     });
   });

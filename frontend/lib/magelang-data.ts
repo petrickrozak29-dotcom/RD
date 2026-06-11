@@ -4,7 +4,12 @@ export type EventScope = 'city' | 'around';
 export type EventCategory = 'Konser Musik' | 'Seni & Budaya' | 'Pameran & Expo' | 'Agenda Lokal';
 export type DeveloperContentType = 'tourism' | 'culinary' | 'culture' | 'history';
 
-export const eventCategories: EventCategory[] = ['Konser Musik', 'Seni & Budaya', 'Pameran & Expo', 'Agenda Lokal'];
+export const eventCategories: EventCategory[] = [
+  'Konser Musik',
+  'Seni & Budaya',
+  'Pameran & Expo',
+  'Agenda Lokal',
+];
 
 export interface DeveloperContentItem {
   id: string;
@@ -112,7 +117,7 @@ export interface CommunityTourism extends SmartMapItem {
 
 export const MAGELANG_CENTER = {
   lat: -7.4797,
-  lng: 110.2177
+  lng: 110.2177,
 };
 
 const COMMUNITY_EVENTS_KEY = 'magelangverse.communityEvents.v1';
@@ -122,36 +127,61 @@ const DEVELOPER_CONTENT_KEYS: Record<DeveloperContentType, string> = {
   tourism: 'magelangverse.developer.tourism.v1',
   culinary: 'magelangverse.developer.culinary.v1',
   culture: 'magelangverse.developer.culture.v1',
-  history: 'magelangverse.developer.history.v1'
+  history: 'magelangverse.developer.history.v1',
 };
 
 const photo = {
   borobudur: 'https://commons.wikimedia.org/wiki/Special:FilePath/Borobudur_Temple.jpg',
-  kyaiLanggeng: 'https://commons.wikimedia.org/wiki/Special:FilePath/Taman%20Kyai%20Langgeng%20(1).png',
+  kyaiLanggeng:
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Taman%20Kyai%20Langgeng%20(1).png',
   getuk: 'https://commons.wikimedia.org/wiki/Special:FilePath/Getuk%20Magelang.JPG',
-  nature: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80',
-  museum: 'https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=1000&q=80',
+  nature:
+    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80',
+  museum:
+    'https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=1000&q=80',
   food: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80',
-  coffee: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1000&q=80',
-  event: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
+  coffee:
+    'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1000&q=80',
+  event:
+    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1000&q=80',
   run: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1000&q=80',
-  expo: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80'
+  expo: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
 };
 
 const locationIndex = [
   { match: ['alun', 'alun-alun'], lat: -7.4797, lng: 110.2177, scope: 'city' as EventScope },
-  { match: ['aim artos', 'artos', 'grand artos'], lat: -7.4912, lng: 110.2265, scope: 'city' as EventScope },
+  {
+    match: ['aim artos', 'artos', 'grand artos'],
+    lat: -7.4912,
+    lng: 110.2265,
+    scope: 'city' as EventScope,
+  },
   { match: ['borobudur'], lat: -7.6079, lng: 110.2038, scope: 'around' as EventScope },
   { match: ['taruna nusantara'], lat: -7.5013, lng: 110.1835, scope: 'city' as EventScope },
   { match: ['ketep'], lat: -7.4943, lng: 110.3811, scope: 'around' as EventScope },
   { match: ['mesa', 'mesastila'], lat: -7.3505, lng: 110.3743, scope: 'around' as EventScope },
-  { match: ['kyai langgeng', 'taman kyai'], lat: -7.4758, lng: 110.2091, scope: 'city' as EventScope },
-  { match: ['tidar', 'gunung tidar', 'puncak tidar'], lat: -7.4894, lng: 110.2221, scope: 'city' as EventScope },
-  { match: ['punthuk setumbu', 'setumbu'], lat: -7.6057, lng: 110.1808, scope: 'around' as EventScope },
+  {
+    match: ['kyai langgeng', 'taman kyai'],
+    lat: -7.4758,
+    lng: 110.2091,
+    scope: 'city' as EventScope,
+  },
+  {
+    match: ['tidar', 'gunung tidar', 'puncak tidar'],
+    lat: -7.4894,
+    lng: 110.2221,
+    scope: 'city' as EventScope,
+  },
+  {
+    match: ['punthuk setumbu', 'setumbu'],
+    lat: -7.6057,
+    lng: 110.1808,
+    scope: 'around' as EventScope,
+  },
   { match: ['mendut'], lat: -7.6047, lng: 110.2304, scope: 'around' as EventScope },
   { match: ['getuk trio', 'gethuk trio'], lat: -7.4725, lng: 110.217, scope: 'city' as EventScope },
   { match: ['kupat tahu'], lat: -7.4812, lng: 110.2229, scope: 'city' as EventScope },
-  { match: ['kwarasan'], lat: -7.4737, lng: 110.2244, scope: 'city' as EventScope }
+  { match: ['kwarasan'], lat: -7.4737, lng: 110.2244, scope: 'city' as EventScope },
 ];
 
 function slugify(value: string) {
@@ -170,14 +200,14 @@ export function resolveLocation(location: string) {
     return {
       latitude: found.lat,
       longitude: found.lng,
-      scope: found.scope
+      scope: found.scope,
     };
   }
 
   return {
     latitude: MAGELANG_CENTER.lat,
     longitude: MAGELANG_CENTER.lng,
-    scope: 'city' as EventScope
+    scope: 'city' as EventScope,
   };
 }
 
@@ -295,7 +325,10 @@ export function hasDeveloperContent(type: DeveloperContentType) {
   return hasStoredContent(type);
 }
 
-export function replaceDeveloperContent(type: DeveloperContentType, records: DeveloperContentItem[]) {
+export function replaceDeveloperContent(
+  type: DeveloperContentType,
+  records: DeveloperContentItem[]
+) {
   writeStoredContent(type, records);
 }
 
@@ -306,7 +339,7 @@ export function upsertDeveloperContent(type: DeveloperContentType, item: Develop
     ...item,
     id: item.id || `${type}-${slugify(item.title || item.period || 'konten')}-${Date.now()}`,
     createdAt: item.createdAt || now,
-    updatedAt: now
+    updatedAt: now,
   };
   const index = records.findIndex((record) => record.id === normalized.id);
 
@@ -321,7 +354,10 @@ export function upsertDeveloperContent(type: DeveloperContentType, item: Develop
 }
 
 export function deleteDeveloperContent(type: DeveloperContentType, id: string) {
-  writeStoredContent(type, readStoredContent(type).filter((item) => item.id !== id));
+  writeStoredContent(
+    type,
+    readStoredContent(type).filter((item) => item.id !== id)
+  );
 }
 
 function toManagedMapItem(type: 'tourism' | 'culinary', item: DeveloperContentItem): SmartMapItem {
@@ -339,13 +375,16 @@ function toManagedMapItem(type: 'tourism' | 'culinary', item: DeveloperContentIt
     latitude: Number(item.latitude ?? resolved.latitude),
     longitude: Number(item.longitude ?? resolved.longitude),
     image: item.image || (type === 'tourism' ? photo.nature : photo.food),
-    link: item.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title)}`,
+    link:
+      item.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title)}`,
     detailUrl: `/smart-map?focus=${item.id}`,
     rating: Number(item.rating || 4.5),
     priceRange: item.priceRange,
     openingHours: item.openingHours,
-    tags: item.details?.length ? item.details : [item.typeLabel || (type === 'tourism' ? 'Wisata' : 'Kuliner')],
-    source: 'user'
+    tags: item.details?.length
+      ? item.details
+      : [item.typeLabel || (type === 'tourism' ? 'Wisata' : 'Kuliner')],
+    source: 'user',
   };
 }
 
@@ -354,20 +393,18 @@ export function getManagedTourismItems() {
     .filter((item) => item.status === 'approved')
     .map((item) => ({
       ...item,
-      detailUrl: `/smart-map?focus=${item.id}`
+      detailUrl: `/smart-map?focus=${item.id}`,
     }));
 
   if (hasStoredContent('tourism')) {
     return [
       ...approvedSubmissions,
-      ...readStoredContent('tourism').map((item) => toManagedMapItem('tourism', item))
+      ...readStoredContent('tourism').map((item) => toManagedMapItem('tourism', item)),
     ];
   }
 
   // When no developer-managed content is present, prefer API-driven items (fetchTourismItems) at runtime.
-  return [
-    ...approvedSubmissions
-  ];
+  return [...approvedSubmissions];
 }
 
 export function getManagedCulinaryItems() {
@@ -375,20 +412,18 @@ export function getManagedCulinaryItems() {
     .filter((item) => item.status === 'approved')
     .map((item) => ({
       ...item,
-      detailUrl: `/smart-map?focus=${item.id}`
+      detailUrl: `/smart-map?focus=${item.id}`,
     }));
 
   if (hasStoredContent('culinary')) {
     return [
       ...approvedSubmissions,
-      ...readStoredContent('culinary').map((item) => toManagedMapItem('culinary', item))
+      ...readStoredContent('culinary').map((item) => toManagedMapItem('culinary', item)),
     ];
   }
 
   // When no developer-managed content is present, prefer API-driven items (fetchCulinaryItems) at runtime.
-  return [
-    ...approvedSubmissions
-  ];
+  return [...approvedSubmissions];
 }
 
 export function getCommunityEvents(apiEvents: CommunityEvent[] = []) {
@@ -446,7 +481,7 @@ export function normalizeApiEvents(records: any[]): CommunityEvent[] {
         scope: (item.scope || resolved.scope) as EventScope,
         source: 'api' as const,
         createdAt: item.createdAt || new Date().toISOString(),
-        tags: Array.isArray(item.tags) ? item.tags : ['Event']
+        tags: Array.isArray(item.tags) ? item.tags : ['Event'],
       };
     });
 }
@@ -477,7 +512,7 @@ export function submitCommunityEvent(input: CommunityEventInput) {
     source: 'user',
     createdAt: new Date().toISOString(),
     submittedBy: input.submittedBy,
-    tags: [typeLabel, 'Menunggu Review']
+    tags: [typeLabel, 'Menunggu Review'],
   };
 
   writeStoredEvents([newEvent, ...readStoredEvents()]);
@@ -489,7 +524,7 @@ export function submitCommunityEvent(input: CommunityEventInput) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           title: newEvent.title,
@@ -499,8 +534,8 @@ export function submitCommunityEvent(input: CommunityEventInput) {
           image: newEvent.image,
           link: newEvent.link,
           featureType: 'EVENT',
-          categoryName: newEvent.typeLabel
-        })
+          categoryName: newEvent.typeLabel,
+        }),
       });
     } catch (err) {
       // ignore network errors; local fallback persists
@@ -525,7 +560,9 @@ export function submitCommunityTourism(input: CommunityTourismInput) {
     latitude: resolved.latitude,
     longitude: resolved.longitude,
     image: input.image?.trim() || photo.nature,
-    link: input.link?.trim() || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanTitle)}`,
+    link:
+      input.link?.trim() ||
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanTitle)}`,
     detailUrl: `/smart-map?focus=${id}`,
     status: 'pending',
     scope: resolved.scope,
@@ -533,7 +570,7 @@ export function submitCommunityTourism(input: CommunityTourismInput) {
     createdAt: new Date().toISOString(),
     submittedBy: input.submittedBy,
     rating: 4.5,
-    tags: ['Spot Populer', 'Menunggu Review']
+    tags: ['Spot Populer', 'Menunggu Review'],
   };
 
   writeStoredTourism([newItem, ...readStoredTourism()]);
@@ -544,7 +581,7 @@ export function submitCommunityTourism(input: CommunityTourismInput) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           title: newItem.title,
@@ -553,8 +590,8 @@ export function submitCommunityTourism(input: CommunityTourismInput) {
           image: newItem.image,
           link: newItem.link,
           featureType: 'WISATA',
-          categoryName: newItem.typeLabel
-        })
+          categoryName: newItem.typeLabel,
+        }),
       });
     } catch {}
   })();
@@ -578,7 +615,9 @@ export function submitCommunityCulinary(input: CommunityCulinaryInput) {
     latitude: resolved.latitude,
     longitude: resolved.longitude,
     image: input.image?.trim() || photo.food,
-    link: input.link?.trim() || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanTitle)}`,
+    link:
+      input.link?.trim() ||
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanTitle)}`,
     detailUrl: `/smart-map?focus=${id}`,
     status: 'pending',
     scope: resolved.scope,
@@ -587,7 +626,7 @@ export function submitCommunityCulinary(input: CommunityCulinaryInput) {
     submittedBy: input.submittedBy,
     priceRange: input.priceRange?.trim() || 'Bervariasi',
     rating: 4.5,
-    tags: [typeLabel, 'Menunggu Review']
+    tags: [typeLabel, 'Menunggu Review'],
   };
 
   writeStoredCulinary([newItem, ...readStoredCulinary()]);
@@ -598,7 +637,7 @@ export function submitCommunityCulinary(input: CommunityCulinaryInput) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           title: newItem.title,
@@ -608,8 +647,8 @@ export function submitCommunityCulinary(input: CommunityCulinaryInput) {
           link: newItem.link,
           priceRange: newItem.priceRange,
           featureType: 'KULINER',
-          categoryName: newItem.typeLabel
-        })
+          categoryName: newItem.typeLabel,
+        }),
       });
     } catch {}
   })();
@@ -618,45 +657,47 @@ export function submitCommunityCulinary(input: CommunityCulinaryInput) {
 }
 
 export function updateCommunityEventStatus(id: string, status: EventStatus) {
-  const events = readStoredEvents().map((event) => (
+  const events = readStoredEvents().map((event) =>
     event.id === id ? { ...event, status } : event
-  ));
+  );
 
   writeStoredEvents(events);
 }
 
 export function updateCommunityCulinaryStatus(id: string, status: EventStatus) {
-  const items = readStoredCulinary().map((item) => (
+  const items = readStoredCulinary().map((item) =>
     item.id === id
       ? {
-        ...item,
-        status,
-        tags: status === 'approved'
-          ? [item.typeLabel, 'Published']
-          : status === 'pending'
-            ? [item.typeLabel, 'Menunggu Review']
-            : [item.typeLabel, 'Ditolak']
-      }
+          ...item,
+          status,
+          tags:
+            status === 'approved'
+              ? [item.typeLabel, 'Published']
+              : status === 'pending'
+                ? [item.typeLabel, 'Menunggu Review']
+                : [item.typeLabel, 'Ditolak'],
+        }
       : item
-  ));
+  );
 
   writeStoredCulinary(items);
 }
 
 export function updateCommunityTourismStatus(id: string, status: EventStatus) {
-  const items = readStoredTourism().map((item) => (
+  const items = readStoredTourism().map((item) =>
     item.id === id
       ? {
-        ...item,
-        status,
-        tags: status === 'approved'
-          ? [item.typeLabel, 'Published']
-          : status === 'pending'
-            ? [item.typeLabel, 'Menunggu Review']
-            : [item.typeLabel, 'Ditolak']
-      }
+          ...item,
+          status,
+          tags:
+            status === 'approved'
+              ? [item.typeLabel, 'Published']
+              : status === 'pending'
+                ? [item.typeLabel, 'Menunggu Review']
+                : [item.typeLabel, 'Ditolak'],
+        }
       : item
-  ));
+  );
 
   writeStoredTourism(items);
 }
@@ -678,22 +719,13 @@ export function buildSmartMapItems(apiEvents: CommunityEvent[] = []) {
     .filter((event) => event.status === 'approved')
     .map((event) => ({
       ...event,
-      detailUrl: `/smart-map?focus=${event.id}`
+      detailUrl: `/smart-map?focus=${event.id}`,
     }));
 
-  return [
-    ...approvedEvents,
-    ...getManagedTourismItems(),
-    ...getManagedCulinaryItems()
-  ];
+  return [...approvedEvents, ...getManagedTourismItems(), ...getManagedCulinaryItems()];
 }
 
-export function distanceKm(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-) {
+export function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   const toRad = (value: number) => (value * Math.PI) / 180;
   const earthRadius = 6371;
   const dLat = toRad(lat2 - lat1);
@@ -718,7 +750,7 @@ export function withDistances<T extends SmartMapItem>(
       return {
         ...item,
         distance,
-        estimatedTravelTime: Math.max(3, Math.ceil((distance / 35) * 60))
+        estimatedTravelTime: Math.max(3, Math.ceil((distance / 35) * 60)),
       };
     })
     .sort((a, b) => a.distance - b.distance);
@@ -730,7 +762,7 @@ export function formatDate(date?: string) {
   return new Intl.DateTimeFormat('id-ID', {
     day: '2-digit',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   }).format(new Date(date));
 }
 
@@ -746,7 +778,11 @@ function normalizeApiItems(records: any[], featureType?: string): SmartMapItem[]
     return {
       id,
       title: String(item.title || item.name || ''),
-      category: (featureType === 'KULINER' ? 'kuliner' : featureType === 'WISATA' ? 'wisata' : 'event') as MapCategory,
+      category: (featureType === 'KULINER'
+        ? 'kuliner'
+        : featureType === 'WISATA'
+          ? 'wisata'
+          : 'event') as MapCategory,
       typeLabel: String(item.category || item.typeLabel || item.type || 'Lainnya'),
       description: String(item.description || item.content || ''),
       location: String(item.location || ''),
@@ -763,7 +799,7 @@ function normalizeApiItems(records: any[], featureType?: string): SmartMapItem[]
       rating: Number(item.rating ?? 4.5),
       priceRange: item.priceRange,
       openingHours: item.openingHours,
-      tags: Array.isArray(item.tags) ? item.tags : ['API']
+      tags: Array.isArray(item.tags) ? item.tags : ['API'],
     } as SmartMapItem;
   });
 }
@@ -773,7 +809,7 @@ export async function fetchEvents(includePending = false): Promise<CommunityEven
     const res = await fetch(`${getApiBaseUrl()}/api/events?includePending=${includePending}`);
     if (!res.ok) return [];
     const payload = await res.json();
-    const records = Array.isArray(payload) ? payload : payload.events ?? [];
+    const records = Array.isArray(payload) ? payload : (payload.events ?? []);
     return normalizeApiEvents(records);
   } catch (err) {
     return [];
@@ -785,7 +821,7 @@ export async function fetchTourismItems(includePending = false): Promise<SmartMa
     const res = await fetch(`${getApiBaseUrl()}/api/tourism?includePending=${includePending}`);
     if (!res.ok) return [];
     const payload = await res.json();
-    const records = Array.isArray(payload) ? payload : payload.items ?? [];
+    const records = Array.isArray(payload) ? payload : (payload.items ?? []);
     return normalizeApiItems(records, 'WISATA');
   } catch (err) {
     return [];
@@ -797,14 +833,17 @@ export async function fetchCulinaryItems(includePending = false): Promise<SmartM
     const res = await fetch(`${getApiBaseUrl()}/api/culinary?includePending=${includePending}`);
     if (!res.ok) return [];
     const payload = await res.json();
-    const records = Array.isArray(payload) ? payload : payload.items ?? [];
+    const records = Array.isArray(payload) ? payload : (payload.items ?? []);
     return normalizeApiItems(records, 'KULINER');
   } catch (err) {
     return [];
   }
 }
 
-export async function fetchUserSubmissions(userId: string, featureType?: 'EVENT' | 'WISATA' | 'KULINER') {
+export async function fetchUserSubmissions(
+  userId: string,
+  featureType?: 'EVENT' | 'WISATA' | 'KULINER'
+) {
   try {
     const params = new URLSearchParams();
     if (userId) params.set('submittedById', userId);
@@ -828,16 +867,16 @@ export async function submitCommunityCulinaryAsync(input: CommunityCulinaryInput
       link: input.link,
       priceRange: input.priceRange,
       featureType: 'KULINER',
-      categoryName: input.typeLabel
+      categoryName: input.typeLabel,
     };
 
     const res = await fetch(`${getApiBaseUrl()}/api/submissions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) throw new Error('Gagal mengirim pengajuan');
@@ -856,16 +895,16 @@ export async function submitCommunityTourismAsync(input: CommunityTourismInput, 
       image: input.image,
       link: input.link,
       featureType: 'WISATA',
-      categoryName: input.submittedBy // note: keep category optional
+      categoryName: input.submittedBy, // note: keep category optional
     };
 
     const res = await fetch(`${getApiBaseUrl()}/api/submissions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) throw new Error('Gagal mengirim pengajuan');
@@ -885,16 +924,16 @@ export async function submitCommunityEventAsync(input: CommunityEventInput, toke
       image: input.image,
       link: input.link,
       featureType: 'EVENT',
-      categoryName: input.typeLabel
+      categoryName: input.typeLabel,
     };
 
     const res = await fetch(`${getApiBaseUrl()}/api/submissions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) throw new Error('Gagal mengirim pengajuan event');
@@ -908,13 +947,11 @@ export async function buildSmartMapItemsAsync() {
   const [events, tourism, culinary] = await Promise.all([
     fetchEvents(false),
     fetchTourismItems(false),
-    fetchCulinaryItems(false)
+    fetchCulinaryItems(false),
   ]);
 
-  const approvedEvents = events.filter((e) => e.status === 'approved').map((event) => ({ ...event, detailUrl: `/smart-map?focus=${event.id}` }));
-  return [
-    ...approvedEvents,
-    ...tourism,
-    ...culinary
-  ];
+  const approvedEvents = events
+    .filter((e) => e.status === 'approved')
+    .map((event) => ({ ...event, detailUrl: `/smart-map?focus=${event.id}` }));
+  return [...approvedEvents, ...tourism, ...culinary];
 }

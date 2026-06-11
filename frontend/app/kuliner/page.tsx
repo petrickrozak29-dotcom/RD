@@ -1,14 +1,28 @@
-"use client";
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ChefHat, DollarSign, ExternalLink, ImagePlus, MapPin, PlusCircle, Star, Utensils } from 'lucide-react';
+import {
+  ChefHat,
+  DollarSign,
+  ExternalLink,
+  ImagePlus,
+  MapPin,
+  PlusCircle,
+  Star,
+  Utensils,
+} from 'lucide-react';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
 import GradientBg from '../../components/gradient-bg';
 import AnimatedBackground from '../../components/animated-background';
 import { useAuth } from '../../contexts/AuthContext';
 import { getApiBaseUrl } from '../../lib/api';
-import { getStoredCommunityCulinary, submitCommunityCulinary, submitCommunityCulinaryAsync, fetchCulinaryItems } from '../../lib/magelang-data';
+import {
+  getStoredCommunityCulinary,
+  submitCommunityCulinary,
+  submitCommunityCulinaryAsync,
+  fetchCulinaryItems,
+} from '../../lib/magelang-data';
 
 type CommunityCulinary = {
   id: string;
@@ -53,7 +67,7 @@ export default function KulinerPage() {
     description: '',
     priceRange: '',
     image: '',
-    link: ''
+    link: '',
   });
 
   useEffect(() => {
@@ -62,11 +76,17 @@ export default function KulinerPage() {
     let timer: any;
     async function fetchCulinary(q?: string) {
       try {
-        const items = await fetchCulinaryItems( /* includePending= */ false);
+        const items = await fetchCulinaryItems(/* includePending= */ false);
         if (!mounted) return;
         if (q) {
           const lower = q.toLowerCase();
-          setItems(items.filter(i => (i.title || '').toLowerCase().includes(lower) || (i.typeLabel || '').toLowerCase().includes(lower)));
+          setItems(
+            items.filter(
+              (i) =>
+                (i.title || '').toLowerCase().includes(lower) ||
+                (i.typeLabel || '').toLowerCase().includes(lower)
+            )
+          );
         } else {
           setItems(items as SmartMapItem[]);
         }
@@ -89,16 +109,14 @@ export default function KulinerPage() {
   }, [items]);
 
   const filtered = useMemo(
-    () => selectedFilter === 'Semua'
-      ? items
-      : items.filter((item) => item.typeLabel === selectedFilter),
+    () =>
+      selectedFilter === 'Semua'
+        ? items
+        : items.filter((item) => item.typeLabel === selectedFilter),
     [selectedFilter, items]
   );
 
-  const userSubmissions = useMemo(
-    () => submissions,
-    [submissions]
-  );
+  const userSubmissions = useMemo(() => submissions, [submissions]);
 
   useEffect(() => {
     let mounted = true;
@@ -123,14 +141,14 @@ export default function KulinerPage() {
 
     fetchMySubmissions();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [isAuthenticated, user]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -150,7 +168,10 @@ export default function KulinerPage() {
 
     (async () => {
       try {
-        const payload = await submitCommunityCulinaryAsync({ ...formState, submittedBy: user?.email }, token ?? undefined);
+        const payload = await submitCommunityCulinaryAsync(
+          { ...formState, submittedBy: user?.email },
+          token ?? undefined
+        );
         setStatus(`${payload.title} berhasil dikirim dan menunggu moderasi.`);
       } catch (err: any) {
         // fallback to local storage when network fails
@@ -164,7 +185,7 @@ export default function KulinerPage() {
           description: '',
           priceRange: '',
           image: '',
-          link: ''
+          link: '',
         });
         setSubmissions(getStoredCommunityCulinary());
       }
@@ -184,13 +205,19 @@ export default function KulinerPage() {
           </div>
           <h1 className="text-4xl font-bold sm:text-5xl">Kuliner Khas Magelang</h1>
           <p className="mx-auto mt-4 max-w-3xl text-slate-300">
-            Rekomendasi makanan khas, oleh-oleh, dan titik kuliner bisa dibuka di Smart Map atau langsung diarahkan ke Google Maps.
+            Rekomendasi makanan khas, oleh-oleh, dan titik kuliner bisa dibuka di Smart Map atau
+            langsung diarahkan ke Google Maps.
           </p>
         </section>
 
         <section className="mb-8 flex flex-wrap justify-center gap-3">
           <div className="flex items-center gap-3">
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari kuliner..." className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-2 text-white outline-none focus:border-amber-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari kuliner..."
+              className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-2 text-white outline-none focus:border-amber-400"
+            />
             {filters.map((filter) => (
               <button
                 key={filter}
@@ -215,11 +242,15 @@ export default function KulinerPage() {
               Tambah Kuliner
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Semua pengajuan kuliner sekarang difokuskan melalui satu fitur "Community Form". Klik tombol untuk mengajukan Kuliner atau UMKM.
+              Semua pengajuan kuliner sekarang difokuskan melalui satu fitur "Community Form". Klik
+              tombol untuk mengajukan Kuliner atau UMKM.
             </p>
 
             <div className="mt-6">
-              <a href="/admin" className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-3 font-semibold text-slate-950 hover:bg-amber-300">
+              <a
+                href="/admin"
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-3 font-semibold text-slate-950 hover:bg-amber-300"
+              >
                 Ajukan via Community Form
               </a>
             </div>
@@ -229,7 +260,10 @@ export default function KulinerPage() {
             <h2 className="text-2xl font-semibold">Submission Saya</h2>
             <div className="mt-5 space-y-4">
               {userSubmissions.slice(0, 4).map((item) => (
-                <article key={item.id} className="rounded-lg border border-slate-800 bg-slate-950/70 p-4">
+                <article
+                  key={item.id}
+                  className="rounded-lg border border-slate-800 bg-slate-950/70 p-4"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h3 className="font-semibold text-white">{item.title}</h3>
@@ -242,7 +276,9 @@ export default function KulinerPage() {
                 </article>
               ))}
               {userSubmissions.length === 0 && (
-                <p className="text-sm text-slate-400">Belum ada kuliner atau UMKM yang dikirim dari perangkat ini.</p>
+                <p className="text-sm text-slate-400">
+                  Belum ada kuliner atau UMKM yang dikirim dari perangkat ini.
+                </p>
               )}
             </div>
           </aside>
@@ -250,7 +286,10 @@ export default function KulinerPage() {
 
         <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((item) => (
-            <article key={item.id} className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/80">
+            <article
+              key={item.id}
+              className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/80"
+            >
               <img src={item.image} alt={item.title} className="h-48 w-full object-cover" />
               <div className="p-6">
                 <div className="mb-3 flex items-start justify-between gap-3">
@@ -278,7 +317,10 @@ export default function KulinerPage() {
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   {item.tags?.map((tag) => (
-                    <span key={tag} className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
+                    <span
+                      key={tag}
+                      className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300"
+                    >
                       {tag}
                     </span>
                   ))}
@@ -317,7 +359,7 @@ function Field({
   value,
   onChange,
   placeholder,
-  required = false
+  required = false,
 }: {
   label: string;
   value: string;

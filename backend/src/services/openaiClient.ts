@@ -37,7 +37,9 @@ export class OpenAIClient {
 
   constructor(config: OpenAIClientConfig) {
     if (!config.apiKey || config.apiKey === 'sk-your-openai-api-key-here') {
-      throw new OpenAIClientError('OpenAI API key is not configured or is using default placeholder');
+      throw new OpenAIClientError(
+        'OpenAI API key is not configured or is using default placeholder'
+      );
     }
 
     this.client = new OpenAI({
@@ -58,10 +60,7 @@ export class OpenAIClient {
   /**
    * Exponential backoff retry mechanism
    */
-  private async withRetry<T>(
-    operation: () => Promise<T>,
-    operationName: string
-  ): Promise<T> {
+  private async withRetry<T>(operation: () => Promise<T>, operationName: string): Promise<T> {
     let lastError: Error | undefined;
     let delay = this.retryConfig.initialDelayMs;
 
@@ -96,10 +95,7 @@ export class OpenAIClient {
         await this.sleep(delay);
 
         // Exponential backoff with cap
-        delay = Math.min(
-          delay * this.retryConfig.backoffMultiplier,
-          this.retryConfig.maxDelayMs
-        );
+        delay = Math.min(delay * this.retryConfig.backoffMultiplier, this.retryConfig.maxDelayMs);
       }
     }
 
@@ -198,7 +194,9 @@ export function initializeOpenAIClient(config: OpenAIClientConfig): OpenAIClient
 
 export function getOpenAIClient(): OpenAIClient {
   if (!openaiClientInstance) {
-    throw new OpenAIClientError('OpenAI client not initialized. Call initializeOpenAIClient first.');
+    throw new OpenAIClientError(
+      'OpenAI client not initialized. Call initializeOpenAIClient first.'
+    );
   }
   return openaiClientInstance;
 }

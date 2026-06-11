@@ -19,12 +19,7 @@ interface DestinationWithDistance {
 }
 
 // Haversine formula for great-circle distance
-export function haversineDistance(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
+export function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   // Convert degrees to radians
   const lat1Rad = (lat1 * Math.PI) / 180;
   const lng1Rad = (lng1 * Math.PI) / 180;
@@ -39,11 +34,11 @@ export function haversineDistance(
   const a =
     Math.sin(deltaLat / 2) ** 2 +
     Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLng / 2) ** 2;
-  
+
   const c = 2 * Math.asin(Math.sqrt(a));
-  
+
   const distance = EARTH_RADIUS_KM * c;
-  
+
   return Math.round(distance * 100) / 100; // Round to 2 decimal places
 }
 
@@ -57,10 +52,7 @@ function validateCoordinates(lat: number, lng: number): void {
   }
 }
 
-export async function updateUserLocation(
-  userId: string,
-  location: LocationInput
-): Promise<any> {
+export async function updateUserLocation(userId: string, location: LocationInput): Promise<any> {
   const { latitude, longitude, accuracy, altitude, speed, source, deviceId } = location;
 
   // Validate coordinates
@@ -81,8 +73,8 @@ export async function updateUserLocation(
       speed,
       timestamp: new Date(),
       source: source || 'gps',
-      deviceId
-    }
+      deviceId,
+    },
   });
 
   return userLocation;
@@ -92,11 +84,11 @@ export async function getUserLocation(userId: string): Promise<any> {
   const location = await prisma.userLocation.findFirst({
     where: {
       userId,
-      isDeleted: false
+      isDeleted: false,
     },
     orderBy: {
-      timestamp: 'desc'
-    }
+      timestamp: 'desc',
+    },
   });
 
   if (!location) {
@@ -106,19 +98,16 @@ export async function getUserLocation(userId: string): Promise<any> {
   return location;
 }
 
-export async function getLocationHistory(
-  userId: string,
-  limit: number = 50
-): Promise<any[]> {
+export async function getLocationHistory(userId: string, limit: number = 50): Promise<any[]> {
   const locations = await prisma.userLocation.findMany({
     where: {
       userId,
-      isDeleted: false
+      isDeleted: false,
     },
     orderBy: {
-      timestamp: 'desc'
+      timestamp: 'desc',
     },
-    take: Math.min(limit, 100) // Max 100
+    take: Math.min(limit, 100), // Max 100
   });
 
   return locations;
@@ -127,7 +116,7 @@ export async function getLocationHistory(
 export async function deleteLocationHistory(userId: string): Promise<void> {
   await prisma.userLocation.updateMany({
     where: { userId },
-    data: { isDeleted: true }
+    data: { isDeleted: true },
   });
 }
 
@@ -152,7 +141,7 @@ export async function getNearbyDestinations(
 
   // Calculate distances and filter
   const destinationsWithDistance: DestinationWithDistance[] = destinations
-    .map(dest => {
+    .map((dest) => {
       const distance = haversineDistance(
         userLocation.latitude,
         userLocation.longitude,
@@ -166,10 +155,10 @@ export async function getNearbyDestinations(
       return {
         destination: dest,
         distance,
-        estimatedTravelTime
+        estimatedTravelTime,
       };
     })
-    .filter(item => item.distance <= radius)
+    .filter((item) => item.distance <= radius)
     .sort((a, b) => a.distance - b.distance)
     .slice(0, limit);
 
