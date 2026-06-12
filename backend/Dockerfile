@@ -1,20 +1,23 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Install dependencies (including dev deps for build)
+# Prisma is more reliable on Debian slim than Alpine for Railway builds.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy Prisma schema before install so package postinstall can generate client.
 COPY package*.json ./
-RUN npm install --no-audit --no-fund
+COPY prisma ./prisma
+RUN npm ci --no-audit --no-fund
 
 # Copy source and build
 COPY . .
 RUN npm run build
 
-# Generate Prisma client
-RUN npm run prisma:generate || true
-
 ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000
 
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
