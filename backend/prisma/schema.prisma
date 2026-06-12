@@ -190,6 +190,7 @@ model Submission {
   link       String?
   priceRange String?
   date       DateTime?
+  publishedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

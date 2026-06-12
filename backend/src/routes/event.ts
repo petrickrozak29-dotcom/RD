@@ -18,22 +18,30 @@ router.get('/', async (req, res) => {
     const events = await submissionService.getSubmissions(filters);
 
     // Map Prisma Submission back to what the frontend expects
-    const mappedEvents = events.map((event) => ({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      location: event.location,
-      latitude: event.latitude,
-      longitude: event.longitude,
-      image: event.image,
-      link: event.link,
-      date: event.date ? event.date.toISOString() : undefined,
-      category: event.category?.name,
-      typeLabel: event.category?.name,
-      status: event.status.toLowerCase(), // Frontend expects 'approved', 'pending', 'rejected'
-      submittedBy: event.submittedBy?.email || event.submittedById,
-      createdAt: event.createdAt.toISOString(),
-    }));
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    const mappedEvents = events.map((event) => {
+      const rawImage = String(event.image || '');
+      const image = rawImage.startsWith('/uploads/') ? `${baseUrl}${rawImage}` : rawImage || undefined;
+
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        location: event.location,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        image,
+        link: event.link,
+        date: event.date ? event.date.toISOString() : undefined,
+        category: event.category?.name,
+        typeLabel: event.category?.name,
+        status: event.status.toLowerCase(), // Frontend expects 'approved', 'pending', 'rejected'
+        submittedBy: event.submittedBy?.email || event.submittedById,
+        createdAt: event.createdAt.toISOString(),
+        publishedAt: event.publishedAt ? event.publishedAt.toISOString() : undefined,
+      };
+    });
 
     res.json(mappedEvents);
   } catch (error) {

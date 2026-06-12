@@ -1,5 +1,6 @@
 import { Submission } from '@prisma/client';
 import prisma from './prismaClient';
+import { log } from './logger';
 
 export interface CreateSubmissionInput {
   title: string;
@@ -38,6 +39,10 @@ export const submissionService = {
         categoryId: category.id,
       },
     });
+
+    try {
+      log('info', 'New submission created', { id: newSubmission.id, title: newSubmission.title, featureType });
+    } catch {}
 
     // Create a system notification for developers/admins about new submission
     try {
@@ -89,10 +94,26 @@ export const submissionService = {
   },
 
   async updateStatus(id: string, status: 'PENDING' | 'APPROVED' | 'REJECTED'): Promise<Submission> {
-    const updated = await prisma.submission.update({
-      where: { id },
-      data: { status },
-    });
+    const data: any = { status };
+    if (status === 'APPROVED') data.publishedAt = new Date();
+    else data.publishedAt = null;
+
+    let updated: Submission;
+    try {
+      updated = await prisma.submission.update({
+        where: { id },
+        data,
+      });
+    } catch (err) {
+      // If the DB schema hasn't been migrated to include publishedAt, retry without it
+      try {
+        log('warn', 'Retrying update without publishedAt (may require prisma migrate)', { id, err: String(err) });
+      } catch {}
+      updated = await prisma.submission.update({
+        where: { id },
+        data: { status },
+      });
+    }
 
     // Notify submitter about status change
     try {
@@ -116,6 +137,7 @@ export const submissionService = {
             payload: JSON.stringify({ submissionId: updated.id }),
           },
         });
+        log('info', 'Submission published', { id: updated.id, title: updated.title });
       }
     } catch (err) {
       console.error('Failed to create notification for status update:', err);

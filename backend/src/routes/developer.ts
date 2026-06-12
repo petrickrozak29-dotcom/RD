@@ -138,8 +138,21 @@ router.get('/content/:type', async (req, res) => {
     const featureType = getFeatureType(type);
 
     const records = await submissionService.getSubmissions({ featureType });
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
     res.json(
-      records.map((r) => ({ ...r, status: r.status.toLowerCase(), typeLabel: r.category?.name }))
+      records.map((r) => {
+        const rawImage = String(r.image || '');
+        const image = rawImage.startsWith('/uploads/') ? `${baseUrl}${rawImage}` : rawImage || undefined;
+
+        return {
+          ...r,
+          image,
+          status: r.status.toLowerCase(),
+          typeLabel: r.category?.name,
+          publishedAt: r.publishedAt ? r.publishedAt.toISOString() : undefined,
+        };
+      })
     );
   } catch (err) {
     res.status(500).json({ error: 'Gagal mengambil konten' });

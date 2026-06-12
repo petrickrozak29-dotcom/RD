@@ -46,6 +46,7 @@ router.get('/', async (req: Request, res: Response) => {
         ...s,
         status: s.status.toLowerCase(),
         typeLabel: s.category?.name,
+        publishedAt: s.publishedAt ? s.publishedAt.toISOString() : undefined,
       }))
     );
   } catch (err) {

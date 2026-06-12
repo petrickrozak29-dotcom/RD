@@ -771,36 +771,38 @@ export function formatDate(date?: string) {
 function normalizeApiItems(records: any[], featureType?: string): SmartMapItem[] {
   if (!Array.isArray(records)) return [];
 
-  return records.map((item) => {
+    return records.map((item) => {
     const resolved = resolveLocation(String(item.location || item.title || ''));
     const id = `${featureType ? featureType.toLowerCase() : 'api'}-${item.id || slugify(String(item.title || 'item'))}`;
+      const rawImage = String(item.image || item.imageUrl || photo.event);
+      const image = rawImage.startsWith('/uploads/') ? `${getApiBaseUrl()}${rawImage}` : rawImage;
 
-    return {
-      id,
-      title: String(item.title || item.name || ''),
-      category: (featureType === 'KULINER'
-        ? 'kuliner'
-        : featureType === 'WISATA'
-          ? 'wisata'
-          : 'event') as MapCategory,
-      typeLabel: String(item.category || item.typeLabel || item.type || 'Lainnya'),
-      description: String(item.description || item.content || ''),
-      location: String(item.location || ''),
-      latitude: Number(item.latitude ?? resolved.latitude),
-      longitude: Number(item.longitude ?? resolved.longitude),
-      image: String(item.image || item.imageUrl || photo.event),
-      link: item.link ? String(item.link) : item.sourceUrl ? String(item.sourceUrl) : undefined,
-      detailUrl: `/smart-map?focus=${id}`,
-      date: item.date ? String(item.date).slice(0, 10) : undefined,
-      time: item.time ? String(item.time) : undefined,
-      status: (item.status || 'approved') as EventStatus,
-      scope: (item.scope || resolved.scope) as EventScope,
-      source: 'api',
-      rating: Number(item.rating ?? 4.5),
-      priceRange: item.priceRange,
-      openingHours: item.openingHours,
-      tags: Array.isArray(item.tags) ? item.tags : ['API'],
-    } as SmartMapItem;
+      return {
+        id,
+        title: String(item.title || item.name || ''),
+        category: (featureType === 'KULINER'
+          ? 'kuliner'
+          : featureType === 'WISATA'
+            ? 'wisata'
+            : 'event') as MapCategory,
+        typeLabel: String(item.category || item.typeLabel || item.type || 'Lainnya'),
+        description: String(item.description || item.content || ''),
+        location: String(item.location || ''),
+        latitude: Number(item.latitude ?? resolved.latitude),
+        longitude: Number(item.longitude ?? resolved.longitude),
+        image,
+        link: item.link ? String(item.link) : item.sourceUrl ? String(item.sourceUrl) : undefined,
+        detailUrl: `/smart-map?focus=${id}`,
+        date: item.date ? String(item.date).slice(0, 10) : undefined,
+        time: item.time ? String(item.time) : undefined,
+        status: (item.status || 'approved') as EventStatus,
+        scope: (item.scope || resolved.scope) as EventScope,
+        source: 'api',
+        rating: Number(item.rating ?? 4.5),
+        priceRange: item.priceRange,
+        openingHours: item.openingHours,
+        tags: Array.isArray(item.tags) ? item.tags : ['API'],
+      } as SmartMapItem;
   });
 }
 

@@ -17,23 +17,31 @@ router.get('/', async (req, res) => {
 
     const culinaryList = await submissionService.getSubmissions(filters);
 
-    const mappedCulinary = culinaryList.map((item) => ({
-      id: item.id,
-      title: item.title,
-      name: item.title, // For backwards compatibility
-      description: item.description,
-      location: item.location,
-      latitude: item.latitude,
-      longitude: item.longitude,
-      image: item.image,
-      link: item.link,
-      priceRange: item.priceRange,
-      category: item.category?.name,
-      typeLabel: item.category?.name,
-      status: item.status.toLowerCase(),
-      submittedBy: item.submittedBy?.email || item.submittedById,
-      createdAt: item.createdAt.toISOString(),
-    }));
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    const mappedCulinary = culinaryList.map((item) => {
+      const rawImage = String(item.image || '');
+      const image = rawImage.startsWith('/uploads/') ? `${baseUrl}${rawImage}` : rawImage || undefined;
+
+      return {
+        id: item.id,
+        title: item.title,
+        name: item.title, // For backwards compatibility
+        description: item.description,
+        location: item.location,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        image,
+        link: item.link,
+        priceRange: item.priceRange,
+        category: item.category?.name,
+        typeLabel: item.category?.name,
+        status: item.status.toLowerCase(),
+        submittedBy: item.submittedBy?.email || item.submittedById,
+        createdAt: item.createdAt.toISOString(),
+        publishedAt: item.publishedAt ? item.publishedAt.toISOString() : undefined,
+      };
+    });
 
     res.json(mappedCulinary);
   } catch (error) {

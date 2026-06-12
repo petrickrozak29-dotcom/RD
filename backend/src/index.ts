@@ -25,7 +25,8 @@ const port = process.env.PORT || 4000;
 
 app.use(cors());
 // Allow larger JSON payloads (images as base64 or large submission bodies)
-app.use(express.json({ limit: '10mb' }));
+// Increased to accommodate larger uploads and base64 payloads
+app.use(express.json({ limit: '100mb' }));
 
 // Guard JSON parse errors to return a friendly response instead of crashing
 app.use((err: any, _req: any, res: any, next: any) => {
