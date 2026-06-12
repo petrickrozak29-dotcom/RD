@@ -13,6 +13,9 @@ jest.mock('@prisma/client', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
+    notification: {
+      create: jest.fn(),
+    },
   };
   return { PrismaClient: jest.fn(() => mPrismaClient) };
 });
@@ -109,7 +112,7 @@ describe('Submission Service', () => {
 
       expect(prisma.submission.update).toHaveBeenCalledWith({
         where: { id: 'sub-1' },
-        data: { status: 'APPROVED' },
+        data: expect.objectContaining({ status: 'APPROVED', publishedAt: expect.any(Date) }),
       });
       expect(result).toEqual(mockUpdated);
     });
