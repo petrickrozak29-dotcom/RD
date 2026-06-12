@@ -39,7 +39,6 @@ router.get('/', async (req, res) => {
         status: event.status.toLowerCase(), // Frontend expects 'approved', 'pending', 'rejected'
         submittedBy: event.submittedBy?.email || event.submittedById,
         createdAt: event.createdAt.toISOString(),
-        publishedAt: event.publishedAt ? event.publishedAt.toISOString() : undefined,
       };
     });
 
