@@ -1,6 +1,9 @@
 export function getApiBaseUrl() {
   const configuredUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-  const defaultProductionUrl = 'https://magelang-production-5158.up.railway.app';
+  
+  console.log('NEXT_PUBLIC_API_URL =', configuredUrl);
+
+  const defaultProductionUrl = 'https://rd-production-ff32.up.railway.app';
 
   if (configuredUrl) {
     return configuredUrl.replace(/\/$/, '');
